@@ -1,5 +1,8 @@
+import 'react-native-reanimated';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import ConnexionScreen from './screens/ConnexionScreen';
 import CreditScreen from './screens/CreditScreen';
@@ -42,6 +45,8 @@ const persistor = persistStore(store);
 */
 import { useFonts } from 'expo-font';
 
+
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -58,6 +63,7 @@ export default function App() {
 
   return (
     <Provider store={store}>
+          <GestureHandlerRootView>
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name='Introduction' component={IntroductionScreen} />
@@ -72,6 +78,8 @@ export default function App() {
             <Stack.Screen name='Splash' component={SplashScreen} />
           </Stack.Navigator>
         </NavigationContainer>
+        </GestureHandlerRootView>
     </Provider>
+
   );
 }
