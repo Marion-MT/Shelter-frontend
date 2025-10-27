@@ -1,5 +1,6 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ImageBackground } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
+import Gauge from '../components/Gauges';
 
 type GameScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -20,6 +21,21 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                 <View style={styles.main}>
                     <View style={styles.darkBackground}>
                         <View style={styles.cardContainer}>
+                            <View style={styles.gaugesContainer}>
+                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={80} indicator={15}/>
+                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={30} indicator={5}/>
+                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={45} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={65} indicator={10}/>
+
+                            </View>
+                            <View style={styles.textContainer}>
+                                
+                            </View>
+                            <View style={styles.choiceCardContainer}>
+                                <View style={styles.backCard}>
+                                
+                                </View> 
+                            </View>
 
                         </View>
 
@@ -30,12 +46,11 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     <View style={styles.foodSection}>
                         <View style={styles.foodGlobalContent}>
                             
-                        <View style={styles.foodBarContainer}>
-                            
-                            <View style={styles.foodBarFill}>
+                            <View style={styles.foodBarContainer}>
+                                <View style={styles.foodBarFill}>
 
+                                </View>
                             </View>
-                        </View>
                             <Image source={require('../assets/icon-food.png')} style={styles.foodIcon} />
                         </View>
 
@@ -93,6 +108,32 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         borderColor: '#554946',
         borderWidth: 5
+
+    },
+    gaugesContainer:{
+        width: '100%',
+        height: '22%',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        paddingHorizontal: 10
+    },
+    textContainer:{
+        width: '100%',
+        height: '22%',
+    },
+    choiceCardContainer:{
+        width: '100%',
+        height: '53%',
+        justifyContent: 'center',
+        alignItems: 'center'
+
+    },
+    backCard:{
+        backgroundColor: '#242120',
+        width: 240,
+        height: 240,
+        borderRadius: 15,
 
     },
     bottomSection: {
