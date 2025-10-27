@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, ImageBackground } from "react-native"
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ImageBackground } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 
 type GameScreenProps = {
@@ -18,10 +18,28 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     <Text style={styles.numberDays}>JOUR 12</Text>
                 </View>
                 <View style={styles.main}>
+                    <View style={styles.darkBackground}>
+                        <View style={styles.cardContainer}>
+
+                        </View>
+
+                    </View>
                 
                 </View>
-                <View style={styles.foodSection}>
-                
+                <View style={styles.bottomSection}>
+                    <View style={styles.foodSection}>
+                        <View style={styles.foodGlobalContent}>
+                            
+                        <View style={styles.foodBarContainer}>
+                            
+                            <View style={styles.foodBarFill}>
+
+                            </View>
+                        </View>
+                            <Image source={require('../assets/icon-food.png')} style={styles.foodIcon} />
+                        </View>
+
+                    </View>
                 </View>
             </View>
            
@@ -42,17 +60,84 @@ const styles = StyleSheet.create({
     },
     hud: {
         justifyContent:'flex-start',
-        height: 50,
-        width : '100%'
+        height: undefined,
+        width : '100%',
+        paddingHorizontal: 20,
+        paddingTop: 30,
     },
     numberDays: {
         color: '#ffe7bf',
-        fontSize: 30,
+        fontSize: 34,
         fontFamily: 'DaysLater',
+        textShadowColor: '#242120',
+        textShadowOffset: { width: 3, height: 3 },
+        textShadowRadius: 2,
     },
     main: {
+        width: '100%',
+        height: undefined,
+        paddingHorizontal: 36,
+        paddingVertical: 30
+    },
+    darkBackground:{
+        backgroundColor : '#242120',
+        width: '100%',
+        height: 650,
+        borderRadius: 20,
+        padding: 12
+    },
+    cardContainer: {
+        backgroundColor : '#342c29',
+        width: '100%',
+        height: '100%',
+        borderRadius: 16,
+        borderColor: '#554946',
+        borderWidth: 5
 
     },
-    foodSection: {
+    bottomSection: {
+        width: '100%',
+        height: undefined,
+        paddingHorizontal: 36,
     },
+    foodSection: {
+        width: '100%',
+        height: 80,
+        backgroundColor: '#342c29',
+        borderColor: '#242120',
+        borderWidth: 8,
+        borderRadius: 16,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    foodGlobalContent:{
+        width: '90%',
+        flexDirection: 'row-reverse',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingRight: 10
+    },
+    foodIcon:{
+        width: 70,
+        height: 70,
+        marginTop: -15,
+        marginRight: -35
+    },
+    foodBarContainer: {
+        width: '100%',
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: '#554946',
+
+        borderColor: '#242120',
+        borderWidth: 4
+
+    },
+    foodBarFill: {
+        width: '90%',
+        height: '100%',
+        borderRadius: 15,
+        backgroundColor: '#8378b7'
+    }
 });
