@@ -13,7 +13,13 @@ export default function EndGameScreen({ navigation }: EndGameScreenProps ) {
         cause: 'hunger',
         title: 'faim',
         description: `Vos efforts n'ont pas suffi. Les réserves sont vides depuis trop longtemps, et la faim vous a emporté.`,
-    }
+        gauges: {
+            moral: 45,
+            security: 60,
+            health: 35,
+            hunger: 0,
+        },
+    };
     
     const changeColor = (cause) => {
         if (cause === 'hunger') {
@@ -36,10 +42,10 @@ export default function EndGameScreen({ navigation }: EndGameScreenProps ) {
                     <View style={styles.darkBackground}>
                         <View style={styles.cardContainer}>
                             <View style={styles.gaugesContainer}>
-                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={0} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={50} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={30} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={65} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={deathData.gauges.hunger} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={deathData.gauges.security} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={deathData.gauges.health} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={deathData.gauges.moral} indicator={0}/>
                             </View>
                             <View style={styles.deadWhat}>
                                 <Image source={require('../assets/icon-skull.png')} resizeMode="contain" style={styles.skullLogo} />
