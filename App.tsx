@@ -1,5 +1,8 @@
+import 'react-native-reanimated';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import ConnexionScreen from './screens/ConnexionScreen';
 import CreditScreen from './screens/CreditScreen';
@@ -12,7 +15,6 @@ import SplashScreen from './screens/SplashScreen';
 import SuccesScreen from './screens/SuccesScreen';
 import RecapGameScreen from './screens/RecapGameScreen';
 
-<<<<<<< HEAD
 //redux imports
 import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
@@ -41,9 +43,9 @@ const store = configureStore({
 
 const persistor = persistStore(store);
 */
-=======
+
 import { useFonts } from 'expo-font';
->>>>>>> fb60c3cdc793ebcbfdca48e595cc83ba86558f3f
+
 
 const Stack = createNativeStackNavigator();
 
@@ -61,6 +63,7 @@ export default function App() {
 
   return (
     <Provider store={store}>
+          <GestureHandlerRootView>
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name='Introduction' component={IntroductionScreen} />
@@ -75,6 +78,8 @@ export default function App() {
             <Stack.Screen name='Splash' component={SplashScreen} />
           </Stack.Navigator>
         </NavigationContainer>
+        </GestureHandlerRootView>
     </Provider>
+
   );
 }
