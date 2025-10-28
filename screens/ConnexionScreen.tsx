@@ -20,9 +20,7 @@ const EMAIL_REGEX: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
 export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
-    
-    console.log(BACKEND_ADDRESS);
-   
+       
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailSignup, setEmailSignup] = useState('');
