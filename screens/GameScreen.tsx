@@ -1,23 +1,112 @@
 import { View, Text, StyleSheet, Image, ImageBackground, Dimensions  } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Gauge from '../components/Gauges';
 import AnimatedCard from '../components/AnimatedCard';
+import { cards } from '../data/cards';
 
 type GameScreenProps = {
     navigation: NavigationProp<ParamListBase>;
 }
 
+export type Choice = {
+  text: string;
+  effect: {
+    hunger: number;
+    security: number;
+    health: number;
+    moral: number;
+    food: number;
+  };
+  consequence?: string | null;
+  trigger?: string | null;
+  endTrigger?: string | null;
+  nextCard?: string | null;
+  nextPool?: string | null;
+  triggerAchievement?: any | null;
+};
+
+export type Conditions = {
+  requiredScenario: string[];
+  forbiddenScenario: string[];
+  minDays: number;
+  maxDays: number;
+  gauges: Record<string, { min: number; max: number }>;
+};
+
+export type Card = {
+  key: string;
+  pool: string;
+  text: string;
+  cooldown: number;
+  incrementsDay: boolean;
+  right: Choice;
+  left: Choice;
+  conditions: Conditions;
+};
+
 
 export default function GameScreen({ navigation }: GameScreenProps ) {
 
-    const foodPercent : number = 40;
+    const [currentCard, setCurrentCard] = useState<Card | null>(null);
+    const [hunger, setHunger] = useState<number>(50);
+    const [security, setSecurity] = useState<number>(50);
+    const [health, setHealth] = useState<number>(50);
+    const [moral, setMoral] = useState<number>(50);
+    const [food, setFood] = useState<number>(50);
+
+    const [currentSide, setCurrentSide] = useState<string>('center');
+
+    const [indexCard, setIndexCard] = useState<number>(0);
+
+    const [triggerReset, setTriggerReset] = useState<boolean>(false);
+
     const numberDays: number = 10;
+
+
+    useEffect(() => {
+        setCurrentCard(cards[0]);
+    }, []);
+    
+    const handleSideChange = (side: string) : void => {
+        setCurrentSide(side)
+    }
+
+    const getNextCard = () : void => {
+
+        setCurrentSide('center');
+
+        setTimeout(() => {
+            const nextIndex = (indexCard + 1) % cards.length;
+            setIndexCard(nextIndex);
+            setCurrentCard(cards[nextIndex]);
+
+        }, 100);
+
+        setTriggerReset(!triggerReset);
+    }
+
+    const onSwipeLeft = () : void => {
+        // Send choice to back
+        getNextCard();
+    }
+
+    const onSwipeRight = () : void => {
+        // Send choice to back
+        getNextCard();
+    }
+
+
+
    
     const handleNavigate = () => {
         navigation.navigate('EndGame', { screen: 'EndGame' });
     };
 
+    const hungerIndicator = currentSide === 'center' ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.hunger || 0) : Math.abs(currentCard?.left?.effect.hunger || 0));
+    const securityIndicator = currentSide === 'center' ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.security || 0) : Math.abs(currentCard?.left?.effect.security || 0));
+    const healthIndicator = currentSide === 'center' ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.health || 0) : Math.abs(currentCard?.left?.effect.health || 0));
+    const moralIndicator = currentSide === 'center' ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.moral || 0) : Math.abs(currentCard?.left?.effect.moral || 0));
 
     return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.backgroundImage}>
@@ -29,18 +118,27 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     <View style={styles.darkBackground}>
                         <View style={styles.cardContainer}>
                             <View style={styles.gaugesContainer}>
-                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={10} indicator={15}/>
-                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={10} indicator={5}/>
-                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={80} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={65} indicator={10}/>
+                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={hunger} indicator={hungerIndicator}/>
+                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={security} indicator={securityIndicator}/>
+                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={health} indicator={healthIndicator}/>
+                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={moral} indicator={moralIndicator}/>
                             </View>
                             <View style={styles.textContainer}>
                                 <Text style={styles.textEvent}>
-                                    Une tempête approche. Elle risque d'endommager le refuge… Nous n'avons pas beaucoup de temps pour nous préparer.
+                                    {currentCard?.text}
                                 </Text>
                             </View>
                             <View style={styles.choiceCardContainer} >
-                               <AnimatedCard leftChoiceText="Oui" rightChoiceText="Non"/>
+                                <View style={styles.cardStack}>
+                                    <AnimatedCard
+                                    leftChoiceText={currentCard?.left?.text || ""}
+                                    rightChoiceText={currentCard?.right?.text || ""}
+                                    onSwipeLeft={onSwipeLeft}
+                                    onSwipeRight={onSwipeRight}
+                                    handleSideChange={(side: string) => handleSideChange(side)}
+                                    triggerReset={triggerReset}
+                                    />
+                                </View>      
                             </View>
                         </View>
                     </View>               
@@ -50,7 +148,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                         <View style={styles.foodGlobalContent}>
                             
                             <View style={styles.foodBarContainer}>
-                                <View style={[styles.foodBarFill, { width: `${foodPercent}%`, borderTopRightRadius: foodPercent <= 95 ? 0 : 10, borderBottomRightRadius: foodPercent <= 95 ? 0 : 10, }]}>
+                                <View style={[styles.foodBarFill, { width: `${food}%`}]}>
 
                                 </View>
                             </View>
@@ -143,21 +241,11 @@ const styles = StyleSheet.create({
         paddingTop: 20
 
     },
-    backCard:{
+    cardStack:{
         backgroundColor: '#242120',
         width: 240,
         height: 240,
         borderRadius: 15,
-    },
-    choiceCard: {
-        backgroundColor: '#ffe7bf',
-        width: 240,
-        height: 240,
-        borderRadius: 15,
-        borderColor: '#242120',
-        borderWidth: 4,
-        overflow: 'hidden'
-
     },
     bottomSection: {
         width: '100%',
@@ -195,13 +283,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#554946',
 
         borderColor: '#242120',
-        borderWidth: 4
+        borderWidth: 4,
+        overflow: 'hidden'
 
     },
     foodBarFill: {
         width: '90%',
         height: '100%',
-        borderRadius: 15,
         backgroundColor: '#8378b7'
     }
 });

@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View, Text, TouchableWithoutFeedback, Dimensions } from "react-native";
-import { useState,  } from 'react';
+import { useState, useEffect  } from 'react';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -23,16 +23,34 @@ type SwipeCardProps = {
   rightChoiceText: string
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
+  handleSideChange: (side: string) => void;
+  triggerReset: boolean;
 };
 
 
-export default function AnimatedCard({ leftChoiceText, rightChoiceText, onSwipeLeft, onSwipeRight }: SwipeCardProps) {
+export default function AnimatedCard({ leftChoiceText, rightChoiceText, onSwipeLeft, onSwipeRight, handleSideChange, triggerReset }: SwipeCardProps) {
 
   const [isFlipped, setIsFlipped] = useState(true);     // whether the card is on the front side or the back side
   const flipRotation = useSharedValue(180); // 0 = front, 180 = back
 
   const translateX = useSharedValue(0);
   const swipeRotation = useSharedValue(0);
+
+  const reset = () => {
+    flipRotation.value = 180; // reset back side
+    setIsFlipped(true);
+    translateX.value = 0;
+    swipeRotation.value = 0;
+
+    // flip after short delay
+    setTimeout(() => {
+      flip();
+    }, 200);
+  }
+
+  useEffect(() => {
+    reset();
+  }, [triggerReset]);
 
   // FLIP ANIMATION
   const flip = () => {
@@ -87,6 +105,10 @@ export default function AnimatedCard({ leftChoiceText, rightChoiceText, onSwipeL
 
     if (Math.abs(translateX.value) > SWIPE_THRESHOLD) {     // Threshold to validate the gesture 
       translateX.value = withSpring(toRight ? width : -width, {});
+
+      if (toRight && onSwipeRight) runOnJS(onSwipeRight)();
+      else if (!toRight && onSwipeLeft) runOnJS(onSwipeLeft)(); 
+      
     } else {
       translateX.value = withSpring(0);
       swipeRotation.value = withSpring(0);
@@ -109,23 +131,24 @@ useAnimatedReaction(
   () => translateX.value,
   (current) => {
     runOnJS(setSwipeSide)(Math.abs(current) > SHOW_TEXT_THRESHOLD ? (current > 0 ? 'right' : 'left') : 'center');
+    runOnJS(handleSideChange)(swipeSide);
   }
 );
 
   return (
     <GestureDetector gesture={panGesture}>
-      <TouchableWithoutFeedback onPress={() => {if(flipRotation.value !== 0) flip()}}>
+      {/*<TouchableWithoutFeedback onPress={() => {if(flipRotation.value !== 0) flip()}}>*/}
         <View style={styles.container}>
           <Animated.View style={[styles.card, styles.front, frontAnimatedStyle, swipeAnimatedStyle]}>
               <View style={styles.textSection}>
-                  {swipeSide !== 'center' && <Text style={styles.textChoice}>{swipeSide === 'right' ? rightChoiceText : leftChoiceText}</Text>}
+                  {swipeSide !== 'center' && <Text style={[styles.textChoice, {textAlign : swipeSide === 'right' ? 'left' : 'right'}]}>{swipeSide === 'right' ? rightChoiceText : leftChoiceText}</Text>}
               </View>    
           </Animated.View>
 
           <Animated.View style={[styles.card, styles.back, backAnimatedStyle]}>
           </Animated.View>
         </View>
-      </TouchableWithoutFeedback>
+      {/*</TouchableWithoutFeedback>*/}
     </GestureDetector>
   );
 }

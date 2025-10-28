@@ -11,15 +11,27 @@ type GaugeProps = {
 
 export default function Gauge({ icon, color, percent, indicator } : GaugeProps) {
 
-
     const delta = 5;    // to shift the fill bar to the top and avoid to hide it behind the icon
     const newPercent = percent === 0 ? 0 : delta + percent * (100 - delta) / 100;
 
- 
+    // indicator
+    let sizeIndicator = 0;
+    if(indicator > 0){
+        if(indicator <= 10){
+            sizeIndicator = 5;
+        }else if(indicator <= 20){
+            sizeIndicator = 10;
+        }
+        else{
+            sizeIndicator = 15;
+        }
+    }
+   
+
   return (
     <View style={styles.container}>
         <View style={styles.indicatorContainer}>
-        {indicator > 0 && <FontAwesome name={'circle' as any} size={indicator} color='#ae9273' />}
+        {indicator > 0 && <FontAwesome name={'circle' as any} size={sizeIndicator} color='#ae9273' />}
         </View>
 
         <View style={styles.gaugeGlobalContent}>                               
