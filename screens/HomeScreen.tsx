@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ImageBackground } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
-import { userValueGame } from "../reducers/user";
+import { setGameState } from "../reducers/user";
 
 type HomeScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -26,7 +26,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
                 console.log('Error:', data.error);
                 return;
             } else {
-                dispatch(userValueGame({ stateOfGauges: data.game.stateOfGauges, numberDays: data.game.numberDays, bestScore: data.game.bestScore }));
+                dispatch(setGameState({ stateOfGauges: data.game.stateOfGauges, numberDays: data.game.numberDays, currentCard: data.game.currentCard }));
                 navigation.navigate('Game', { screen: 'Game' });
             };
         });      
