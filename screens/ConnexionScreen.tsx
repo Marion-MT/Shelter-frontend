@@ -1,9 +1,12 @@
+import Constants from 'expo-constants';
 import { View, Modal, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ImageBackground } from "react-native"
 import { useState } from "react"; 
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 
 import { useDispatch } from "react-redux";
 import { signin } from "../reducers/user";
+
+
 
 type ConnexionScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -12,12 +15,10 @@ type ConnexionScreenProps = {
 // Grabbed from emailregex.com
 const EMAIL_REGEX: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-
-const BACKEND_ADDRESS = 'http://192.168.1.78:3000';
-
+const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
 export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
-   
+       
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [emailSignup, setEmailSignup] = useState('');
