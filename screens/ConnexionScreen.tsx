@@ -6,12 +6,16 @@ import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useDispatch } from "react-redux";
 import { signin } from "../reducers/user";
 
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Entypo from '@expo/vector-icons/Entypo';
 
 
 type ConnexionScreenProps = {
     navigation: NavigationProp<ParamListBase>;
 }
 
+//<Entypo name="eye-with-line" size={24} color="black" />,
+//<Entypo name="eye" size={24} color="black" />
 // Grabbed from emailregex.com
 const EMAIL_REGEX: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
@@ -24,12 +28,24 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
     const [emailSignup, setEmailSignup] = useState('');
     const [passwordSignup, setPasswordSignup] = useState('');
     const [emailError, setEmailError] = useState(false);
-    const [isVisible, setIsvisible] = useState(false); //pour que le MDP soit caché
-    const [isSignupVisible, setIsSignupVisible] = useState(false); //état de la modal    
+    const [isPWDVisible, setIsPWDvisible] = useState(false); //pour que le MDP soit caché
+    const [isSignupVisible, setIsSignupVisible] = useState(false); //état de la modal
+    const [signinError, SetSigninError] = useState('')
+    const [signupError, setSignupError] = useState('')
+    const [passwordError, setPasswordError] = useState('')    
 
     const dispatch = useDispatch();
 
     const handleSignin = () => {
+            SetSigninError('');
+            if(!email || !password){
+                SetSigninError('Veuillez remplir tous les champs');
+                return;
+            }
+             if(!EMAIL_REGEX.test(email)){
+                SetSigninError('Email invalide')
+                return;
+             }
             fetch(`${BACKEND_ADDRESS}/users/signin`, {
                 method: 'POST',
                 headers: {'Content-Type' : 'application/json'},
@@ -43,17 +59,33 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                     dispatch(signin({token : data.token, email}))
                     setEmail('')
                     setPassword('')
+                    SetSigninError('')
                     navigation.navigate('Home', { screen: 'Home' });
-                    ;
                 } else {
-                    console.error('Erreur de connexion:', data.error);
+                    //console.error('Erreur de connexion:', data.error);
+                    SetSigninError("Utilisateur introuvable")
                 }
             })
-
+            .catch(error => {
+                console.error('Erreur de réseau', error)
+                SetSigninError('Erreur de connexion au serveur')
+            });
         }
 
         const handleSignup = () => {
-            if (EMAIL_REGEX.test(emailSignup)){
+            setEmailError(false);
+            setPasswordError('');
+            setSignupError('')
+
+            if (!EMAIL_REGEX.test(emailSignup)){
+                setEmailError(true);
+                return;
+            }
+
+            if (!passwordSignup || passwordSignup.length < 3){
+                setPasswordError("Le mot de passe doit contenir au moins 3 caratères")
+                return
+            }
                 
                 fetch(`${BACKEND_ADDRESS}/users/signup`,{
                     method: "POST",
@@ -66,18 +98,24 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                         dispatch(signin({token : data.token, email: emailSignup}))
                         setEmailSignup('')
                         setPasswordSignup('')
+                        setEmailError(false)
+                        setSignupError('')
+                        setPasswordError('')
                         setIsSignupVisible(false);
                         navigation.navigate('Home', { screen: 'Home' });
                     } else {
-                        console.error('Erreur de connexion:', data.error)
+                        //console.error('Erreur de connexion:', data.error)
+                        setSignupError('Email déjà utilisé')
                         setEmailSignup("")
                         setPassword('')
                     }
                 })
-            } else {
-                setEmailError(true)
-            }
+            .catch(error => {
+                console.error('Erreur réseau', error)
+                setSignupError('Erreur de connexion au serveur')
+            });
         };
+        
     
 
     return (
@@ -86,37 +124,45 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                 <View style={styles.text}>
                     <Text style={styles.title}>Connexion</Text>
                     <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    autoCapitalize="none"
-                    keyboardType="email-address"
-                    autoComplete="email"
-                    onChangeText={(value) => setEmail(value)}
-                    value={email}
+                        style={styles.input}
+                        placeholder="Email"
+                        autoCapitalize="none"
+                        keyboardType="email-address"
+                        autoComplete="email"
+                        onChangeText={(value) => {setEmail(value); SetSigninError('')}}
+                        value={email}
                     />
-                    <TextInput 
-                    style={styles.input}
-                    placeholder="Password"
-                    autoCapitalize="none"
-                    textContentType="password"
-                    autoCorrect = {false}
-                    keyboardType="default"
-                    secureTextEntry={!isVisible}
-                    onChangeText={(value) => setPassword(value)}
-                    value={password}
-                    />
+
+                    <View style={styles.passwordContainer}>
+                        <TextInput 
+                            style={styles.passwordInput}
+                            placeholder="Password"
+                            autoCapitalize="none"
+                            textContentType="password"
+                            autoCorrect = {false}
+                            keyboardType="default"
+                            secureTextEntry={!isPWDVisible}
+                            onChangeText={(value) => {setPassword(value); SetSigninError('')}}
+                            value={password}
+                        />
+                        <TouchableOpacity style={styles.eyeButton} onPress={()=>setIsPWDvisible(!isPWDVisible)}>
+                            <Entypo name={isPWDVisible ? "eye-with-line" : "eye"} size={22} color={'#352c2bb0'}/>
+                        </TouchableOpacity>
+                    </View>
+                    {signinError && <Text style={styles.error}>{signinError}</Text>}
+
                     <TouchableOpacity onPress={() => handleSignin()} style={styles.button} activeOpacity={0.8}>
                         <Text style={styles.buttonText}>Go</Text>
                     </TouchableOpacity>
                     <Text style={styles.title2}>Pas encore de compte ?</Text>
-                    <TouchableOpacity onPress={() => setIsSignupVisible(true)} style={styles.button} activeOpacity={0.8}>
+                    <TouchableOpacity onPress={() => {setIsSignupVisible(true); setEmail(''); setPassword('')}} style={styles.button} activeOpacity={0.8}>
                         <Text style={styles.buttonText}>Créer un compte</Text>
                     </TouchableOpacity>
                     <Modal
                     visible = {isSignupVisible}
                     animationType='slide'
                     transparent={true}
-                    onRequestClose={()=> setIsSignupVisible(false)}
+                    onRequestClose={()=> {setIsSignupVisible(false); setEmailError(false); setPasswordError(''); setSignupError('')}}
                     >
                         <View style={styles.modalOverlay}>
                             <View style={styles.modalContent}>
@@ -124,31 +170,37 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                                 <TextInput
                                     style={styles.inputModal}
                                     placeholder="Email"
-                                    onChangeText={(value) => setEmailSignup(value)}
+                                    onChangeText={(value) => {setEmailSignup(value);setEmailError(false)}}
                                     value={emailSignup}
                                     autoCapitalize="none"
                                     keyboardType="email-address"
                                     autoComplete="email"
                                 />
-
-                                <TextInput 
-                                    style={styles.inputModal}
-                                    placeholder="Password"
-                                    autoCapitalize="none"
-                                    textContentType="password"
-                                    autoCorrect = {false}
-                                    keyboardType="default"
-                                    secureTextEntry={!isVisible}
-                                    onChangeText={(value) => setPasswordSignup(value)}
-                                    value={passwordSignup}
-                                />
-                                {emailError && <Text style={styles.error}>Invalid email address</Text>}
+                                <View style={styles.passwordContainerModal}>
+                                    <TextInput 
+                                        style={styles.passwordInputModal}
+                                        placeholder="Password"
+                                        autoCapitalize="none"
+                                        textContentType="password"
+                                        autoCorrect = {false}
+                                        keyboardType="default"
+                                        secureTextEntry={!isPWDVisible}
+                                        onChangeText={(value) => {setPasswordSignup(value); setPasswordError('')}}
+                                        value={passwordSignup}
+                                    />
+                                    <TouchableOpacity style={styles.eyeButton} onPress={()=>setIsPWDvisible(!isPWDVisible)}>
+                                        <Entypo name={isPWDVisible ? "eye-with-line" : "eye"} size={22} color={'#352c2bb0'}/>
+                                    </TouchableOpacity>
+                                </View>
+                                {emailError && <Text style={styles.error}>Email invalide</Text>}
+                                {passwordError && <Text style={styles.error}>{passwordError}</Text>}
+                                {signupError && <Text style={styles.error}>{signupError}</Text>}
 
                                 <View style={styles.modalButtons}>
                                     <TouchableOpacity style={styles.btn} onPress={handleSignup}>
                                         <Text style={styles.buttonTextModal}>Valider</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={styles.btn} onPress={()=> setIsSignupVisible(false)}>
+                                    <TouchableOpacity style={styles.btn} onPress={()=> {setIsSignupVisible(false); setEmailSignup(''); setPasswordSignup('')}}>
                                         <Text style={styles.buttonTextModal}>Annuler</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -289,6 +341,52 @@ const styles = StyleSheet.create({
 
     error: {
         marginTop: 10,
-        color: 'red',
+        color: '#ff4444',
+        marginBottom: 10,
+        textAlign: 'center',
+        fontWeight: '500',
     },
+
+    eyeButton: {
+    },
+      
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: 240,
+        height: 50,
+        backgroundColor: '#FFE7BF',
+        borderWidth: 1,
+        borderColor: "#ddd",
+        borderRadius: 8,
+        paddingHorizontal: 15,
+        marginBottom: 15,
+    },
+
+     passwordInput: {
+        flex: 1,
+        height: '100%',
+        color: "#342C29",
+        fontSize: 16,
+    },
+
+    passwordContainerModal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    backgroundColor: "#FFE7BF",
+    height: 50,
+},
+
+passwordInputModal: {
+    flex: 1,
+    height: '100%',
+    color: '#342C29',
+    fontSize: 16,
+},
 });
