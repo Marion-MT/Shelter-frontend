@@ -1,8 +1,8 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ImageBackground } from "react-native"
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useFocusEffect } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
 import { setGameState, setUserData } from "../reducers/user";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type HomeScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -17,25 +17,47 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
 
-    useEffect(() => {
-        fetch(`${BACKEND_ADDRESS}/users/data`, {
-            method: 'GET',
-            headers: { Authorization: `Bearer ${user.token}` }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                setCurrentGame(false);
-                console.log('Error:', data.error);
-                return;
-            } else {
-                dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
-                if (data.currentGame) {
-                    setCurrentGame(true);
+    useFocusEffect(
+        useCallback(() => {
+            fetch(`${BACKEND_ADDRESS}/users/data`, {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${user.token}` }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.currentGame) {
+                    console.log('Error:', data.error);
+                    setCurrentGame(false);
+                    return;
+                } else {
+                    dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
+                    if (data.currentGame) {
+                        setCurrentGame(true);
+                    }
                 }
-            }
-        });
-    },[]);
+            });
+        }, [])
+    );
+
+    // useEffect(() => {
+    //     fetch(`${BACKEND_ADDRESS}/users/data`, {
+    //         method: 'GET',
+    //         headers: { Authorization: `Bearer ${user.token}` }
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         if (data.error) {
+    //             setCurrentGame(false);
+    //             console.log('Error:', data.error);
+    //             return;
+    //         } else {
+    //             dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
+    //             if (data.currentGame) {
+    //                 setCurrentGame(true);
+    //             }
+    //         }
+    //     });
+    // },[]);
 
     const handleCurrentGame = () => {
         fetch(`${BACKEND_ADDRESS}/games/current`, {
@@ -46,7 +68,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
         .then(data => {
             if (data.error) {            
                 console.log('Error:', data.error);
-                setCurrentGame(false);
                 return;
             } else {
                 dispatch(setGameState({ stateOfGauges: data.currentGame.stateOfGauges, numberDays: data.currentGame.numberDays, currentCard: data.currentGame.currentCard }));
@@ -69,9 +90,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
             } else {
                 dispatch(setGameState({ stateOfGauges: data.game.stateOfGauges, numberDays: data.game.numberDays, currentCard: data.game.currentCard }));
                 navigation.navigate('Game', { screen: 'Game' });
-                if (!currentGame) {
-                    setCurrentGame(true);
-                }   
             };
         });      
     };
