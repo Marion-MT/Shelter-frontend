@@ -1,8 +1,8 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ImageBackground } from "react-native"
+import { View, Text, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ImageBackground } from "react-native"
 import { NavigationProp, ParamListBase, useFocusEffect } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
 import { setGameState, setUserData } from "../reducers/user";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 type HomeScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -26,38 +26,20 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
             .then(response => response.json())
             .then(data => {
                 if (!data.currentGame) {
-                    console.log('Error:', data.error);
+                    console.log('Pas de game en cours');
                     setCurrentGame(false);
                     return;
                 } else {
                     dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
                     if (data.currentGame) {
                         setCurrentGame(true);
+                        console.log('Game en cours');
+                        
                     }
                 }
             });
         }, [])
     );
-
-    // useEffect(() => {
-    //     fetch(`${BACKEND_ADDRESS}/users/data`, {
-    //         method: 'GET',
-    //         headers: { Authorization: `Bearer ${user.token}` }
-    //     })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         if (data.error) {
-    //             setCurrentGame(false);
-    //             console.log('Error:', data.error);
-    //             return;
-    //         } else {
-    //             dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
-    //             if (data.currentGame) {
-    //                 setCurrentGame(true);
-    //             }
-    //         }
-    //     });
-    // },[]);
 
     const handleCurrentGame = () => {
         fetch(`${BACKEND_ADDRESS}/games/current`, {
