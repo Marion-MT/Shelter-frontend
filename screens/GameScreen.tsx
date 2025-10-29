@@ -84,6 +84,8 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     return;
                 }
 
+                console.log(data);
+
                 setLastResponse(data);
 
                 dispatch(setGauges(data.gauges));
@@ -105,6 +107,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     return;
                 }
 
+                dispatch(setCurrentNumberDays(data.numberDays));
                 SetLocked(true);
 
                 setTimeout(() => {
