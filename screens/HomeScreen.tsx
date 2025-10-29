@@ -2,6 +2,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Keyboard
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
 import { setGameState, setUserData } from "../reducers/user";
+import { useEffect, useState } from "react";
 
 type HomeScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -10,27 +11,27 @@ type HomeScreenProps = {
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
 export default function HomeScreen({ navigation }: HomeScreenProps ) {
+    const [localUserData, setLocalUserData] = useState<{bestScore: number; soundOn: boolean; volume: number} | null>(null);
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
 
-    const userData = () =>  {
+    useEffect(() => {
         fetch(`${BACKEND_ADDRESS}/users/data`, {
             method: 'GET',
             headers: { Authorization: `Bearer ${user.token}` }
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-
             if (data.error) {
                 console.log('Error:', data.error);
                 return;
             } else {
                 dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
+                setLocalUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume });
             }
         });
-    }
-   
+    },[]);
+     
     const handleNewGame = () => {
         fetch(`${BACKEND_ADDRESS}/games/new`, {
             method: 'POST',
@@ -63,7 +64,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
     };
 
     return (
-        userData(),
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.container}>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
                 <Text style={styles.title}>shelter</Text>
