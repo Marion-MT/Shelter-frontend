@@ -2,26 +2,28 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, Keyboard
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 
 import Gauge from "../components/Gauges";
+import { useSelector } from "react-redux";
 
 type EndGameScreenProps = {
     navigation: NavigationProp<ParamListBase>;
 }
 
-export default function EndGameScreen({ navigation }: EndGameScreenProps ) {
+type EndGameRouteParams = {
+    type: string;
+    hook: string;
+    phrase: string;
+    description: string;
+}
 
-    const deathData = {
-        cause: 'hunger',
-        title: 'faim',
-        description: `Vos efforts n'ont pas suffi. Les réserves sont vides depuis trop longtemps, et la faim vous a emporté.`,
-        gauges: {
-            moral: 45,
-            security: 60,
-            health: 35,
-            hunger: 0,
-        },
+export default function EndGameScreen({ navigation, route }: EndGameScreenProps & { route: { params: EndGameRouteParams } }) {
+    const { type, hook, phrase, description } = route.params;
+    const user = useSelector((state: string) => state.user.value);
+
+    const handleNavigate = () => {
+        navigation.navigate('RecapGame', { screen: 'RecapGame' });
     };
     
-    const changeColor = (cause) => {
+    const changeColor = (cause: string) => {
         if (cause === 'hunger') {
             return '#f28f27'
         }
@@ -42,23 +44,23 @@ export default function EndGameScreen({ navigation }: EndGameScreenProps ) {
                     <View style={styles.darkBackground}>
                         <View style={styles.cardContainer}>
                             <View style={styles.gaugesContainer}>
-                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={deathData.gauges.hunger} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={deathData.gauges.security} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={deathData.gauges.health} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={deathData.gauges.moral} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={user.stateOfGauges.hunger} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={user.stateOfGauges.security} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={user.stateOfGauges.health} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={user.stateOfGauges.moral} indicator={0}/>
                             </View>
                             <View style={styles.deadWhat}>
                                 <Image source={require('../assets/icon-skull.png')} resizeMode="contain" style={styles.skullLogo} />
-                                <Text style={styles.deadText}>vous êtes morts de</Text>
-                                <Text style={[styles.deadCause, {color: changeColor(deathData.cause)}]}>{deathData.title}</Text>
+                                <Text style={styles.deadText}>{phrase}</Text>
+                                <Text style={[styles.deadCause, {color: changeColor(type)}]}>{hook}</Text>
                             </View>
                             <View style={styles.deadResume}>
-                                <Text style={styles.resumeText}>{deathData.description}</Text>
+                                <Text style={styles.resumeText}>{description}</Text>
                             </View>
                         </View>
                     </View>
                 </View>    
-                <TouchableOpacity style={[styles.button, {backgroundColor: changeColor(deathData.cause)}]} activeOpacity={0.8}>
+                <TouchableOpacity onPress={() => handleNavigate()} style={[styles.button, {backgroundColor: changeColor(type)}]} activeOpacity={0.8}>
                 <Text style={styles.btnText}>continuer</Text>
                 </TouchableOpacity>
             </ImageBackground>
