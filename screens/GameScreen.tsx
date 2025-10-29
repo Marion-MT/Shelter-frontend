@@ -50,6 +50,8 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const [showConsequence, setShowConsequence] = useState<boolean>(false);
     const [consequenceText, setConsequenceText] = useState<string | null>(null);
 
+    const [locked, SetLocked] = useState<boolean>(false); // lock interaction during animations times
+
     const [lastResponse, setLastResponse] = useState<GameResponse|null>(null); //used to store data when there is a consequence to display before displaying the next card (or gameover)
     
     const handleSideChange = (side: string) : void => {
@@ -86,15 +88,15 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
                 dispatch(setGauges(data.gauges));
 
-                // get the consequences of the nextcard to display
+                // get the consequences of the last Card played
                 const cons = currentSide === 'right' ? currentCard?.right?.consequence : currentCard?.left?.consequence;
 
-                if (cons) {
+                if (cons) { // Show the consequence
                     setConsequenceText(cons);
                     setShowConsequence(true);
                     setTriggerReset(!triggerReset);
                     dispatch(setCurrentNumberDays(data.numberDays));
-                    return;
+                    return; // dont display next card !
                 }
 
                 if(data.gameover || !data.card){
@@ -103,29 +105,43 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     return;
                 }
 
+                SetLocked(true);
+
                 setTimeout(() => {
                     dispatch(setCurrentCard(data.card));
                 }, 100);
 
                 setTriggerReset(!triggerReset);
+
+                 setTimeout(() => {
+                    SetLocked(false);
+                }, 200);
             }
-            else{
-                    setConsequenceText(null);
-                    setShowConsequence(false);
+            else{     // After the consequence
 
+                setConsequenceText(null);
 
-                    if(lastResponse && (lastResponse.gameover || !lastResponse.card)){
-                        if(lastResponse.death)
-                            triggerGameover(lastResponse.death.type, lastResponse.death.title.hook, lastResponse.death.title.phrase, lastResponse.death.description);
-                        return;
-                    }
+                if(lastResponse && (lastResponse.gameover || !lastResponse.card)){
+                    if(lastResponse.death)
+                        triggerGameover(lastResponse.death.type, lastResponse.death.title.hook, lastResponse.death.title.phrase, lastResponse.death.description);
+                    return;
+                }
+
+                SetLocked(true);
 
                 setTimeout(() => {
                     if(lastResponse?.card)
                         dispatch(setCurrentCard(lastResponse.card));
+                        setShowConsequence(false);
                 }, 100);
 
                 setTriggerReset(!triggerReset);
+
+                setTimeout(() => {
+                    SetLocked(false);
+                }, 200);
+
+
 
 
             }
@@ -154,10 +170,12 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const moral = Math.min(Math.max(user.stateOfGauges.moral, 0), 100);
     const food = Math.min(Math.max(user.stateOfGauges.food, 0), 100);
 
-    const hungerIndicator = currentSide === 'center' || showConsequence ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.hunger || 0) : Math.abs(currentCard?.left?.effect.hunger || 0));
-    const securityIndicator = currentSide === 'center' || showConsequence ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.security || 0) : Math.abs(currentCard?.left?.effect.security || 0));
-    const healthIndicator = currentSide === 'center' || showConsequence ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.health || 0) : Math.abs(currentCard?.left?.effect.health || 0));
-    const moralIndicator = currentSide === 'center' || showConsequence ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.moral || 0) : Math.abs(currentCard?.left?.effect.moral || 0));
+    const hideIndicators = currentSide === 'center' || showConsequence || locked || lastResponse?.gameover;
+
+    const hungerIndicator = hideIndicators? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.hunger || 0) : Math.abs(currentCard?.left?.effect.hunger || 0));
+    const securityIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.security || 0) : Math.abs(currentCard?.left?.effect.security || 0));
+    const healthIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.health || 0) : Math.abs(currentCard?.left?.effect.health || 0));
+    const moralIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.moral || 0) : Math.abs(currentCard?.left?.effect.moral || 0));
 
     return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.backgroundImage}>
