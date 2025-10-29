@@ -16,6 +16,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        setCurrentGame(false);
         fetch(`${BACKEND_ADDRESS}/users/data`, {
             method: 'GET',
             headers: { Authorization: `Bearer ${user.token}` }
@@ -24,7 +25,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
         .then(data => {
             if (data.error) {
                 console.log('Error:', data.error);
-                setCurrentGame(false);
                 return;
             } else {
                 dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
