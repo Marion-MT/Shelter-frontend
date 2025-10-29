@@ -30,13 +30,15 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
     const dispatch = useDispatch();
 
     const handleSignin = () => {
+        console.log("handleSignin");
             fetch(`${BACKEND_ADDRESS}/users/signin`, {
                 method: 'POST',
                 headers: {'Content-Type' : 'application/json'},
                 body: JSON.stringify({email, password})
             })
-            .then(response => response.json())
+            .then(response => {console.log("response received"); return response.json()})
             .then(data => {
+                console.log("data received");
                 if (data.result){
                     console.log("data signin =>",data)
                     //stokage du token et redirection

@@ -60,6 +60,10 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
         setLastResponse(null);
         setShowConsequence(false);
         setConsequenceText(null);
+
+        console.log("gauges", user.stateOfGauges);
+        console.log("number days", user.numberDays);
+
     }, []);
     
     const handleSideChange = (side: string) : void => {
@@ -105,7 +109,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     setConsequenceText(cons);
                     setShowConsequence(true);
                     setTriggerReset(!triggerReset);
-                    dispatch(setCurrentNumberDays(data.numberDays));
+
                     return; // dont display next card !
                 }
 
