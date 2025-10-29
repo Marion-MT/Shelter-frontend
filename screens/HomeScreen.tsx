@@ -12,11 +12,12 @@ const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
 export default function HomeScreen({ navigation }: HomeScreenProps ) {
     const [currentGame, setCurrentGame] = useState(false);
+    console.log(currentGame);
+    
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        setCurrentGame(false);
         fetch(`${BACKEND_ADDRESS}/users/data`, {
             method: 'GET',
             headers: { Authorization: `Bearer ${user.token}` }
@@ -24,6 +25,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
         .then(response => response.json())
         .then(data => {
             if (data.error) {
+                setCurrentGame(false);
                 console.log('Error:', data.error);
                 return;
             } else {
@@ -42,11 +44,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.error) {
+            if (data.error) {            
                 console.log('Error:', data.error);
+                setCurrentGame(false);
                 return;
             } else {
-                console.log(data);               
                 dispatch(setGameState({ stateOfGauges: data.currentGame.stateOfGauges, numberDays: data.currentGame.numberDays, currentCard: data.currentGame.currentCard }));
                 navigation.navigate('Game', { screen: 'Game' });
             }
@@ -60,14 +62,16 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
         })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            
+            console.log(data);      
             if (data.error) {
                 console.log('Error:', data.error);
                 return;
             } else {
                 dispatch(setGameState({ stateOfGauges: data.game.stateOfGauges, numberDays: data.game.numberDays, currentCard: data.game.currentCard }));
                 navigation.navigate('Game', { screen: 'Game' });
+                if (!currentGame) {
+                    setCurrentGame(true);
+                }   
             };
         });      
     };
