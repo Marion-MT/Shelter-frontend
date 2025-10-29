@@ -12,12 +12,7 @@ const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 export default function RecapGameScreen({ navigation }: RecapGameScreenProps ) {
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
-    
-    const gameData = {
-        numberDays: 40, 
-        bestScore: 35,
-    };
-   
+
     const checkScore = () => {
         if (user.numberDays > user.bestScore) {
             return ( 

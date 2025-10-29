@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ImageBackground } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
-import { setGameState } from "../reducers/user";
+import { setGameState, setUserData } from "../reducers/user";
 
 type HomeScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -12,6 +12,24 @@ const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 export default function HomeScreen({ navigation }: HomeScreenProps ) {
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
+
+    const userData = () =>  {
+        fetch(`${BACKEND_ADDRESS}/users/data`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${user.token}` }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+
+            if (data.error) {
+                console.log('Error:', data.error);
+                return;
+            } else {
+                dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
+            }
+        });
+    }
    
     const handleNewGame = () => {
         fetch(`${BACKEND_ADDRESS}/games/new`, {
@@ -45,6 +63,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
     };
 
     return (
+        userData(),
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.container}>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
                 <Text style={styles.title}>shelter</Text>
