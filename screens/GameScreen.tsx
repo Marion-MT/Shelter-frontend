@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, Image, ImageBackground, Dimensions  } from "react-native"
+import { View, Text, StyleSheet, Image, ImageBackground, Dimensions, TouchableOpacity  } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Gauge from '../components/Gauges';
 import AnimatedCard from '../components/AnimatedCard';
 import { cards } from '../data/cards';
@@ -54,6 +54,14 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
     const [lastResponse, setLastResponse] = useState<GameResponse|null>(null); //used to store data when there is a consequence to display before displaying the next card (or gameover)
     
+    
+    useEffect(() => {
+        SetLocked(false);
+        setLastResponse(null);
+        setShowConsequence(false);
+        setConsequenceText(null);
+    }, []);
+    
     const handleSideChange = (side: string) : void => {
         setCurrentSide(side)
     }
@@ -84,7 +92,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     return;
                 }
 
-                console.log(data);
+                //console.log(data);
 
                 setLastResponse(data);
 
@@ -184,6 +192,9 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.backgroundImage}>
             <View style={styles.container}>
                 <View style={styles.hud}>
+                    <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home', { screen: 'Menu'})}>
+                        <Image source={require('../assets/icon-arrow.png')} style={styles.leftArrow} />
+                    </TouchableOpacity>
                     <Text style={styles.numberDays}>JOUR {user.numberDays}</Text>
                 </View>
                 <View style={styles.main}>
@@ -248,11 +259,20 @@ const styles = StyleSheet.create({
         width: '100%'
     },
     hud: {
-        justifyContent:'flex-start',
         height: undefined,
         width : '100%',
-        paddingHorizontal: 20,
+        paddingHorizontal: 40,
         paddingTop: 30,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    backButton: {
+        width: 40,
+        height: 40
+    },
+    leftArrow:{
+        width: '100%',
+        height: '100%'
     },
     numberDays: {
         color: '#ffe7bf',
@@ -297,7 +317,6 @@ const styles = StyleSheet.create({
         height: '25%',
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical : 5,
         paddingHorizontal: 20,
     },
     textEvent: {
