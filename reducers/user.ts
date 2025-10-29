@@ -54,13 +54,13 @@ export type UserState= {
         numberDays: number | null;
         bestScore: number | null;
         currentCard: Card | null;
+        soundOn: boolean;
+        volume: number;
     }
 }
 
-
-
 const initialState: UserState = {
-    value : {email: null, token: null, stateOfGauges: null, numberDays: null, bestScore: null, currentCard: null },
+    value : {email: null, token: null, stateOfGauges: null, numberDays: null, bestScore: null, currentCard: null, soundOn: true, volume: 50},
 };
 
 export const userSlice = createSlice({
@@ -84,9 +84,14 @@ export const userSlice = createSlice({
         },
         setCurrentNumberDays:(state, action: PayloadAction<number>) =>{
             state.value.numberDays = action.payload
-        }
+        },
+        setUserData:(state, action: PayloadAction<{bestScore: number; soundOn: boolean; volume: number}>) =>{
+            state.value.bestScore = action.payload.bestScore;
+            state.value.soundOn = action.payload.soundOn;
+            state.value.volume = action.payload.volume;
+        },
     }
-})
+});
 
-export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays } = userSlice.actions;
+export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays, setUserData } = userSlice.actions;
 export default userSlice.reducer;

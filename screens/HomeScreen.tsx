@@ -1,7 +1,8 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ImageBackground } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
-import { setGameState } from "../reducers/user";
+import { setGameState, setUserData } from "../reducers/user";
+import { useEffect, useState } from "react";
 
 type HomeScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -12,7 +13,23 @@ const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 export default function HomeScreen({ navigation }: HomeScreenProps ) {
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
-   
+
+    useEffect(() => {
+        fetch(`${BACKEND_ADDRESS}/users/data`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${user.token}` }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.log('Error:', data.error);
+                return;
+            } else {
+                dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
+            }
+        });
+    },[]);
+     
     const handleNewGame = () => {
         fetch(`${BACKEND_ADDRESS}/games/new`, {
             method: 'POST',
