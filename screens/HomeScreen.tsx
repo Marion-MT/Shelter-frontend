@@ -11,7 +11,6 @@ type HomeScreenProps = {
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
 export default function HomeScreen({ navigation }: HomeScreenProps ) {
-    const [localUserData, setLocalUserData] = useState<{bestScore: number; soundOn: boolean; volume: number} | null>(null);
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
 
@@ -27,7 +26,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
                 return;
             } else {
                 dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
-                setLocalUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume });
             }
         });
     },[]);
