@@ -1,10 +1,17 @@
 import { View, Text, StyleSheet, Image, ImageBackground, Dimensions, TouchableOpacity  } from "react-native"
 import { NavigationProp, ParamListBase, useFocusEffect } from '@react-navigation/native';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  withRepeat,
+  FadeIn,
+  FadeOut
+} from "react-native-reanimated";
 import Gauge from '../components/Gauges';
 import AnimatedCard from '../components/AnimatedCard';
-import { cards } from '../data/cards';
-import { responses } from '../data/responses';
+
 
 import { useSelector, useDispatch } from "react-redux";
 import { setGauges, setCurrentCard, setCurrentNumberDays, Card } from "../reducers/user";
@@ -54,6 +61,8 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
     const [lastResponse, setLastResponse] = useState<GameResponse|null>(null); //used to store data when there is a consequence to display before displaying the next card (or gameover)
     
+    const foodBlink = useSharedValue(1);
+
     useFocusEffect(
         useCallback(() => {
             SetLocked(false);
@@ -202,6 +211,23 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const healthIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.health || 0) : Math.abs(currentCard?.left?.effect.health || 0));
     const moralIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.moral || 0) : Math.abs(currentCard?.left?.effect.moral || 0));
 
+    // Blick anim when food is empty
+    useEffect(() => {
+    if (food === 0) {
+        foodBlink.value = withRepeat(
+        withTiming(0.5, { duration: 1000 }), // fade to 0 in 500ms
+        -1, // loop infinite
+        true // reverse
+        );
+    } else {
+        foodBlink.value = withTiming(1, { duration: 300 }); // return to normal
+    }
+    }, [food]);
+
+    const foodBlinkStyle = useAnimatedStyle(() => ({
+        opacity: foodBlink.value
+    }));
+
     return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.backgroundImage}>
             <View style={styles.container}>
@@ -215,15 +241,21 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     <View style={styles.darkBackground}>
                         <View style={styles.cardContainer}>
                             <View style={styles.gaugesContainer}>
-                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={hunger} indicator={hungerIndicator}/>
-                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={security} indicator={securityIndicator}/>
-                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={health} indicator={healthIndicator}/>
-                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={moral} indicator={moralIndicator}/>
+                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={hunger} indicator={hungerIndicator} decrease={food === 0}/>
+                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={security} indicator={securityIndicator} decrease={false}/>
+                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={health} indicator={healthIndicator} decrease={false}/>
+                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={moral} indicator={moralIndicator} decrease={false}/>
                             </View>
                             <View style={styles.textContainer}>
-                                <Text style={styles.textEvent}>
+                                <Animated.Text  // smooth fade on the text
+                                    key={currentCard?.text} // trigger anim when currentCard?.text change
+                                    entering={FadeIn.duration(200)}
+                                    exiting={FadeOut.duration(200)}
+                                    style={styles.textEvent}
+                                    >
                                     {currentCard?.text}
-                                </Text>
+                                </Animated.Text>
+
                             </View>
                             <View style={styles.choiceCardContainer} >
                                 <View style={styles.cardStack}>
@@ -250,7 +282,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
                                 </View>
                             </View>
-                            <Image source={require('../assets/icon-food.png')} style={styles.foodIcon} />
+                            <Animated.Image source={require('../assets/icon-food.png')} style={[styles.foodIcon, foodBlinkStyle]} />
                         </View>
 
                     </View>

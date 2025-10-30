@@ -9,6 +9,9 @@ import Animated, {
   withSpring,
   useAnimatedReaction,
   runOnJS,
+  Layout,
+  FadeIn,
+  FadeOut
 } from "react-native-reanimated";
 import { ViewStyle } from 'react-native';
 
@@ -125,6 +128,16 @@ export default function AnimatedCard({ isConsequence, leftChoiceText, rightChoic
     ],
   }));
 
+  // TEXT ANIMATION
+  const textAnimatedStyle = useAnimatedStyle(() => {
+
+  const progress = Math.min(Math.abs(translateX.value) / SWIPE_THRESHOLD, 1);
+
+  return {
+      opacity: withTiming(progress, { duration: 100 }),
+    };
+  });
+
 
 // get the information of the swipe side
 const [swipeSide, setSwipeSide] = useState<'left' | 'right' | 'center'>('center');
@@ -149,9 +162,26 @@ useAnimatedReaction(
           </Animated.View> :
           // Normal layout
           <Animated.View style={[styles.card, styles.front, frontAnimatedStyle, swipeAnimatedStyle]}>
-              <View style={styles.textSection}>
-                  {swipeSide !== 'center' && <Text style={[styles.textChoice, {textAlign : swipeSide === 'right' ? 'left' : 'right'}]}>{swipeSide === 'right' ? rightChoiceText : leftChoiceText}</Text>}
-              </View>
+
+            <Animated.View
+              layout={Layout.duration(100)} // smooth animation of the text section
+              style={styles.textSection}
+            >
+              {swipeSide !== 'center' &&
+                <Animated.Text  // smooth fade on the text
+                  key={swipeSide} // trigger anim when swipeSide change
+                  entering={FadeIn.duration(150)}
+                  exiting={FadeOut.duration(150)}
+                  style={[
+                    styles.textChoice,
+                    { textAlign: swipeSide === 'right' ? 'left' : 'right' }
+                  ]}
+                >
+                  {swipeSide === 'right' ? rightChoiceText : leftChoiceText}
+                </Animated.Text>
+              }
+            </Animated.View>
+
           </Animated.View>
           }
          
