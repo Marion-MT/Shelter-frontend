@@ -90,8 +90,12 @@ export const userSlice = createSlice({
             state.value.soundOn = action.payload.soundOn;
             state.value.volume = action.payload.volume;
         },
+        signout:(state) => {
+            state.value = initialState.value;
+            console.log("dispatch signout=>",initialState)
+        }
     }
 });
 
-export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays, setUserData } = userSlice.actions;
+export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays, setUserData, signout } = userSlice.actions;
 export default userSlice.reducer;

@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, KeyboardAvoidingView, ImageBackground } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
-import { setGameState, setUserData } from "../reducers/user";
+import { setGameState, setUserData, signout } from "../reducers/user";
 import { useEffect, useState } from "react";
 
 type HomeScreenProps = {
@@ -84,6 +84,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
         navigation.navigate('Credit', { screen: 'Credit' });
     };
 
+    const handleLogout = () => {
+        console.log("pré-signout", user)
+        dispatch(signout())
+        navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
+    };
+
     return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.container}>
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
@@ -104,6 +110,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
                     <TouchableOpacity onPress={() => handleNavigateCredit()} style={styles.button} activeOpacity={0.8}>
                         <Text style={styles.btnText}>crédits</Text>
                     </TouchableOpacity> */}
+                    <TouchableOpacity onPress={() => handleLogout()} style={styles.button} activeOpacity={0.8}>
+                        <Text style={styles.btnText}>Se deconnecter</Text>
+                    </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
         </ImageBackground>
