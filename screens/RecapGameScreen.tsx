@@ -1,7 +1,8 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Image } from "react-native"
-import { NavigationProp, ParamListBase } from '@react-navigation/native';
+import { NavigationProp, ParamListBase, useFocusEffect } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
-import { setGameState } from "../reducers/user";
+import { setGameState, updateBestScore } from "../reducers/user";
+import { useCallback, useState } from "react";
 
 type RecapGameScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -12,9 +13,24 @@ const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 export default function RecapGameScreen({ navigation }: RecapGameScreenProps ) {
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
+    const [newBestScore, setNewBestScore] = useState<Boolean>(false);
+
+    // Update best score in reduce
+    useFocusEffect(
+        useCallback(() => {
+            if(user.numberDays > user.bestScore){
+                dispatch(updateBestScore(user.numberDays));
+                setNewBestScore(true);
+            }
+            else{
+                setNewBestScore(false);
+            }
+        }, [])
+    );
+  
 
     const checkScore = () => {
-        if (user.numberDays > user.bestScore) {
+        if (newBestScore) {
             return ( 
                 <View style={styles.darkBackground}>
                     <View style={styles.cardContainer}>
@@ -186,8 +202,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         width: '47.5%',
         height: 70,
-        borderWidth: 1.5,
-        borderColor: 'black',
         borderRadius: 15,
         marginTop: 30,
         backgroundColor: '#D05A34',
@@ -197,8 +211,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         width: '47.5%',
         height: 70,
-        borderWidth: 1.5,
-        borderColor: 'black',
         borderRadius: 15,
         marginTop: 30,
         backgroundColor: '#74954E',
@@ -207,6 +219,6 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
         fontSize: 23,
         fontWeight: 'bold',
-        color: 'black',
+        color: '#EFDAB7',
     },
 });

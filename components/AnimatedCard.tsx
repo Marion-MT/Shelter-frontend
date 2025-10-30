@@ -41,8 +41,9 @@ export default function AnimatedCard({ isConsequence, leftChoiceText, rightChoic
   const swipeRotation = useSharedValue(0);
 
   const reset = () => {
-    flipRotation.value = 180; // reset back side
     setIsFlipped(true);
+    setSwipeSide('center');
+    flipRotation.value = 180; // reset back side
     translateX.value = 0;
     swipeRotation.value = 0;
 
@@ -53,7 +54,6 @@ export default function AnimatedCard({ isConsequence, leftChoiceText, rightChoic
   }
 
   useEffect(() => {
-    setSwipeSide('center');
     reset();
   }, [triggerReset]);
 
@@ -128,15 +128,6 @@ export default function AnimatedCard({ isConsequence, leftChoiceText, rightChoic
     ],
   }));
 
-  // TEXT ANIMATION
-  const textAnimatedStyle = useAnimatedStyle(() => {
-
-  const progress = Math.min(Math.abs(translateX.value) / SWIPE_THRESHOLD, 1);
-
-  return {
-      opacity: withTiming(progress, { duration: 100 }),
-    };
-  });
 
 
 // get the information of the swipe side

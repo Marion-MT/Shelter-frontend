@@ -90,6 +90,9 @@ export const userSlice = createSlice({
             state.value.soundOn = action.payload.soundOn;
             state.value.volume = action.payload.volume;
         },
+        updateBestScore: (state, action: PayloadAction<number>) =>{
+            state.value.bestScore = action.payload
+        },
         signout:(state) => {
             state.value = initialState.value;
             console.log("dispatch signout=>",initialState)
@@ -97,5 +100,5 @@ export const userSlice = createSlice({
     }
 });
 
-export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays, setUserData, signout } = userSlice.actions;
+export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays, setUserData, signout, updateBestScore } = userSlice.actions;
 export default userSlice.reducer;

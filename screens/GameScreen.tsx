@@ -70,15 +70,21 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
             setShowConsequence(false);
             setConsequenceText(null);
             setCurrentSide('center');
-            setTriggerReset(!triggerReset);
+            setTriggerReset(prev => !prev);
 
-            console.log("gauges", user.stateOfGauges);
-            console.log("number days", user.numberDays);
+
+
+             return () => {
+                SetLocked(false);
+                setLastResponse(null);
+                setShowConsequence(false);
+                setConsequenceText(null);
+                setCurrentSide('center');
+                setTriggerReset(prev => !prev);
+            };
 
         }, [])
     );
-
-    console.log("currentSide = " + currentSide);
     
 
     const handleSideChange = (side: string) : void => {
@@ -97,6 +103,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
         try{
             if(!showConsequence){
+                console.log("pas de consequences");
                 const response = await fetch(`${BACKEND_ADDRESS}/games/choice`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${user.token}`,
@@ -150,6 +157,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
             else{     // After the consequence
 
                 setConsequenceText(null);
+                
 
                 if(lastResponse && (lastResponse.gameover || !lastResponse.card)){
                     if(lastResponse.death)
@@ -160,9 +168,14 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                 SetLocked(true);
 
                 setTimeout(() => {
-                    if(lastResponse?.card)
+
+                    if(lastResponse?.card){
                         dispatch(setCurrentCard(lastResponse.card));
-                        setShowConsequence(false);
+                        dispatch(setCurrentNumberDays(lastResponse.numberDays));
+                    }
+
+
+                    setShowConsequence(false);
                 }, 100);
 
                 setTriggerReset(!triggerReset);
@@ -171,12 +184,8 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     SetLocked(false);
                 }, 200);
 
-
-
-
             }
             
-
         }catch (err) {
 
         }

@@ -25,12 +25,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
             })
             .then(response => response.json())
             .then(data => {
+                dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
                 if (!data.currentGame) {
                     console.log('Pas de game en cours');
                     setCurrentGame(false);
                     return;
-                } else {
-                    dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.soundOn, volume: data.volume }));
+                } else {                
                     if (data.currentGame) {
                         setCurrentGame(true);
                         console.log('Game en cours');
