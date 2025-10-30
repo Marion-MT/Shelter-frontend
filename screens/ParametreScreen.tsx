@@ -94,20 +94,25 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
                         animationType="slide"
                         onRequestClose={() => setModalVisible(false)}
                         >
-                            <View style={styles.modalContainer}>
-                                <Text style={styles.modalText}>Voulez vous vraiment réinitialisé votre compte ?</Text>
-
-                                <TouchableOpacity onPress={() => {handleResetAccount(); setModalVisible(false);}}>
-                                    <View style={styles.btnContainer}>
-                                        <Text style={styles.btnYes}>Oui</Text>
-                                    </View>
-                                </TouchableOpacity>    
-                                <TouchableOpacity onPress={() => {handleResetAccount(); setModalVisible(false);}}>
-                                    <View style={styles.btnContainer}>
-                                        <Text style={styles.btnNo}>Non</Text>
-                                    </View>
-                                </TouchableOpacity>       
-                                
+                            <View style={styles.modalOverlay}>
+                                <View style={styles.modalBackground}>
+                                    <View style={styles.modalContainer}>
+                                        <Text style={styles.modalText}>Voulez vous vraiment réinitialisé votre compte ?</Text>
+                                        <Text style={styles.modalText2}>Cette action est irréversible.</Text>
+                                        <View style={styles.modalBtns}>
+                                            <TouchableOpacity onPress={() => setModalVisible(false)}>
+                                                <View style={styles.btnContainerNo}>
+                                                    <Text style={styles.modalBtnText}>Non</Text>
+                                                </View>
+                                            </TouchableOpacity>   
+                                            <TouchableOpacity onPress={() => {handleResetAccount(); setModalVisible(false);}}>
+                                                <View style={styles.btnContainerYes}>
+                                                    <Text style={styles.modalBtnText}>Oui</Text>
+                                                </View>
+                                            </TouchableOpacity>    
+                                        </View> 
+                                    </View>   
+                                </View>
                             </View>
                         </Modal>
                     </View>
@@ -181,6 +186,79 @@ const styles = StyleSheet.create({
     btnText: {
         color: '#FFE8BF',
         fontSize: 18,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalBackground: {
+        width: 350,
+        height: 350,
+        padding: 10,
+        backgroundColor: '#242120',
+        borderRadius: 20,
+    },
+    modalContainer: {
+        flex: 1,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor : '#342c29',
+        width: '100%',
+        height: '100%',
+        borderRadius: 16,
+        borderColor: '#554946',
+        borderWidth: 5
+    },
+    modalBtns: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '90%',
+        marginBottom: 20,
+    },
+    modalText: {
+        color: '#FFE8BF',
+        fontSize: 20,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: 40,
+    },
+    modalText2: {
+        color: '#FFE8BF',
+        fontSize: 17,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: 60,
+    },
+    btnContainerYes: {
+        width: 130,
+        height: 60,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#74954E',
+        borderColor: 'black',
+        borderWidth: 1.5,
+        borderRadius: 12,
+        marginBottom: 25,
+    },
+    btnContainerNo: {
+        width: 130,
+        height: 60,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#D05A34',
+        borderColor: 'black',
+        borderWidth: 1.5,
+        borderRadius: 12,
+        marginBottom: 25,
+    },
+    modalBtnText: {
+        color: '#FFE8BF',
+        fontSize: 20,
         fontWeight: 'bold',
         textTransform: 'uppercase',
     },
