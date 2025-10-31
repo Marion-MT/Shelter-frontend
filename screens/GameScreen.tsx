@@ -66,9 +66,10 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const foodBlink = useSharedValue(1);
 
     const [backgroundMusic, setBackgroundMusic] = useState<Audio.Sound | null>(null);
+    const [cardSound, setCardSound] = useState<Audio.Sound | null>(null);
 
     // Fonction pour charger et jouer la musique de fond
-  const loadBackgroundMusic = async () => {
+    const loadBackgroundMusic = async () => {
         const { sound } = await Audio.Sound.createAsync(
         require('../assets/sounds/Free.mp3'),
         { isLooping: true, volume: 0.25 }
@@ -79,18 +80,47 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
         await sound.playAsync();
     };
 
-    // Charge et lance la musique au montage du composant
+    // Arrête la musique quand la partie est terminée
+    const stopBackgroundMusic = async () => {
+        if (backgroundMusic) {
+        await backgroundMusic.stopAsync();
+        }
+    };
+
+    // Fonction pour charger le son des cartes
+    const loadCardSound = async () => {
+        const { sound } = await Audio.Sound.createAsync(
+        require('../assets/sounds/woosh-v2.mp3'),        
+        { volume: 0.25 }
+        );
+        setCardSound(sound);
+    };
+
+    // Joue le son de validation des cartes
+  const playCardSound = async () => {
+    if (cardSound) {
+      await cardSound.replayAsync();
+    }
+  };
+
+    // Charge les sons au montage du composant
     useEffect(() => {
         loadBackgroundMusic();
+        loadCardSound();
         
         return () => {
+            // Nettoyer les ressources lors de la fermeture du composant
             if (backgroundMusic) {
                 backgroundMusic.unloadAsync();
+            }
+            if (cardSound) {
+                cardSound.unloadAsync();
             }
         };
     }, []);
 
-    // Arrêter la musique lorsque l'utilisateur change d'écran
+
+    // Arrête la musique lorsque l'utilisateur change d'écran
     useFocusEffect(
         useCallback(() => {
             return () => {
@@ -131,6 +161,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
     const triggerGameover = (type: string, hook: string, phrase: string, description: string, achievements: [Object] ) => {
         setTimeout(() => {
+            stopBackgroundMusic(); // Stop the background music
             navigation.navigate('EndGame', { screen: 'EndGame', type: type, hook: hook, phrase: phrase, description: description, achievements: achievements  });
         }, 1000);
     }
