@@ -23,6 +23,7 @@ const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 export default function RecapGameScreen({ navigation, route }: RecapGameScreenProps & { route: { params: RecapGameRouteParams } }) {
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
+    const [previousBestScore, setPreviousBestScore] = useState<number>(user.bestScore || 0);
     const [newBestScore, setNewBestScore] = useState<Boolean>(false);
 
     const { achievements } = route.params;
@@ -68,7 +69,7 @@ export default function RecapGameScreen({ navigation, route }: RecapGameScreenPr
                         </View>
                         <View style={styles.bestScore}>
                             <Image source={require('../assets/icon-star.png')} style={styles.logo} />
-                            <Text style={styles.bestScoreText}>Last Record : {user.bestScore} jours</Text>
+                            <Text style={styles.bestScoreText}>Last Record : {previousBestScore} jours</Text>
                         </View>
                         {succes.length === 0 ? (
                         <ScrollView contentContainerStyle={styles.scrollView}>
