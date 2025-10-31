@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Image, ImageBackground, Dimensions, TouchableOpacity  } from "react-native"
 import { NavigationProp, ParamListBase, useFocusEffect } from '@react-navigation/native';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, use } from 'react';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -12,9 +12,11 @@ import Animated, {
 import Gauge from '../components/Gauges';
 import AnimatedCard from '../components/AnimatedCard';
 
-
 import { useSelector, useDispatch } from "react-redux";
 import { setGauges, setCurrentCard, setCurrentNumberDays, Card } from "../reducers/user";
+
+import { Audio } from 'expo-av';
+import { getImageByType } from '../modules/imagesSelector';
 
 type GameScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -61,9 +63,45 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const [locked, SetLocked] = useState<boolean>(false); // lock interaction during animations times
 
     const [lastResponse, setLastResponse] = useState<GameResponse|null>(null); //used to store data when there is a consequence to display before displaying the next card (or gameover)
-    
+        
     const foodBlink = useSharedValue(1);
 
+    const [backgroundMusic, setBackgroundMusic] = useState<Audio.Sound | null>(null);
+
+    // Fonction pour charger et jouer la musique de fond
+  const loadBackgroundMusic = async () => {
+        const { sound } = await Audio.Sound.createAsync(
+        require('../assets/sounds/Free.mp3'),
+        { isLooping: true, volume: 0.25 }
+        );
+        setBackgroundMusic(sound);
+        console.log(backgroundMusic);
+        
+        await sound.playAsync();
+    };
+
+    // Charge et lance la musique au montage du composant
+    useEffect(() => {
+        loadBackgroundMusic();
+        
+        return () => {
+            if (backgroundMusic) {
+                backgroundMusic.unloadAsync();
+            }
+        };
+    }, []);
+
+    // Arrêter la musique lorsque l'utilisateur change d'écran
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                if (backgroundMusic) {
+                    backgroundMusic.stopAsync();
+                }
+            };
+        }, [backgroundMusic])
+    );
+    
     useFocusEffect(
         useCallback(() => {
             SetLocked(false);
@@ -114,7 +152,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                 const data = await response.json();
 
                 if(!data.result){
-                    triggerGameover("","","","");
+                    triggerGameover("","","","",[{}]);
                     return;
                 }
 
@@ -221,6 +259,10 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const healthIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.health || 0) : Math.abs(currentCard?.left?.effect.health || 0));
     const moralIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.moral || 0) : Math.abs(currentCard?.left?.effect.moral || 0));
 
+    const keyParts = currentCard.key.split('-')
+    const image = getImageByType(keyParts[0]);
+
+
     // Blick anim when food is empty
     useEffect(() => {
     if (food === 0) {
@@ -275,8 +317,8 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                                         style={styles.backImage}
                                         />
                                     </View>
-                                    
                                         <AnimatedCard
+                                        image = {image}
                                         isConsequence={showConsequence}
                                         leftChoiceText={showConsequence ? consequenceText : (currentCard?.left?.text || "")}
                                         rightChoiceText={showConsequence ? consequenceText  : (currentCard?.right?.text || "")}
