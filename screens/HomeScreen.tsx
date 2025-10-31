@@ -13,19 +13,21 @@ type HomeScreenProps = {
 
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
+// Importation du fichier audio
 const audioSource = require('../assets/sounds/button-clic-v1.mp3');
 
 export default function HomeScreen({ navigation }: HomeScreenProps ) {
     const [currentGame, setCurrentGame] = useState(false);
-    //console.log(currentGame);
     
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
 
+    // Initialisation du fichier audio
     const player = useAudioPlayer(audioSource);
     
+    // Fonction pour que le son puisse être joué à chaque appel
     const playSound = () => {
-        player.seekTo(0);
+        player.seekTo(0); // Remet le son au début (permet de jouer le son plusieurs fois)
         player.play();
     };
 
