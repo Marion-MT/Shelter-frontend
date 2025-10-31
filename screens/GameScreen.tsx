@@ -16,6 +16,8 @@ import AnimatedCard from '../components/AnimatedCard';
 import { useSelector, useDispatch } from "react-redux";
 import { setGauges, setCurrentCard, setCurrentNumberDays, Card } from "../reducers/user";
 
+import { getImageByType } from '../modules/imagesSelector';
+
 type GameScreenProps = {
     navigation: NavigationProp<ParamListBase>;
 }
@@ -61,7 +63,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const [locked, SetLocked] = useState<boolean>(false); // lock interaction during animations times
 
     const [lastResponse, setLastResponse] = useState<GameResponse|null>(null); //used to store data when there is a consequence to display before displaying the next card (or gameover)
-    
+        
     const foodBlink = useSharedValue(1);
 
     useFocusEffect(
@@ -114,7 +116,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                 const data = await response.json();
 
                 if(!data.result){
-                    triggerGameover("","","","");
+                    triggerGameover("","","","",[{}]);
                     return;
                 }
 
@@ -221,6 +223,10 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const healthIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.health || 0) : Math.abs(currentCard?.left?.effect.health || 0));
     const moralIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.moral || 0) : Math.abs(currentCard?.left?.effect.moral || 0));
 
+    const keyParts = currentCard.key.split('-')
+    const image = getImageByType(keyParts[0]);
+
+
     // Blick anim when food is empty
     useEffect(() => {
     if (food === 0) {
@@ -275,8 +281,8 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                                         style={styles.backImage}
                                         />
                                     </View>
-                                    
                                         <AnimatedCard
+                                        image = {image}
                                         isConsequence={showConsequence}
                                         leftChoiceText={showConsequence ? consequenceText : (currentCard?.left?.text || "")}
                                         rightChoiceText={showConsequence ? consequenceText  : (currentCard?.right?.text || "")}
