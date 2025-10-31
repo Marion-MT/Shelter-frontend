@@ -177,7 +177,7 @@ useAnimatedReaction(
           }
          
           <Animated.View style={[styles.card, styles.back, backAnimatedStyle]}>
-
+            <Image source={require('../assets/backcard_v5.png')} style={styles.backImage} />
           </Animated.View>
         </View>
       {/*</TouchableWithoutFeedback>*/}
@@ -220,6 +220,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#242120",
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    backImage: {
+      width: '100%',
+      height: '100%'
     },
     radioactiveIcon: {
         width: 150,

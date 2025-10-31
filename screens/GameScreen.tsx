@@ -269,16 +269,24 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                             </View>
                             <View style={styles.choiceCardContainer} >
                                 <View style={styles.cardStack}>
-                                    <AnimatedCard
-                                    isConsequence={showConsequence}
-                                    leftChoiceText={showConsequence ? consequenceText : (currentCard?.left?.text || "")}
-                                    rightChoiceText={showConsequence ? consequenceText  : (currentCard?.right?.text || "")}
-                                    onSwipeLeft={onSwipeLeft}
-                                    onSwipeRight={onSwipeRight}
-                                    handleSideChange={(side: string) => handleSideChange(side)}
-                                    triggerReset={triggerReset}
-                                    />
-                                </View>      
+                                    <View style={styles.imageMask}>
+                                        <Image
+                                        source={require('../assets/backcard_v5.png')}
+                                        style={styles.backImage}
+                                        />
+                                    </View>
+                                    
+                                        <AnimatedCard
+                                        isConsequence={showConsequence}
+                                        leftChoiceText={showConsequence ? consequenceText : (currentCard?.left?.text || "")}
+                                        rightChoiceText={showConsequence ? consequenceText  : (currentCard?.right?.text || "")}
+                                        onSwipeLeft={onSwipeLeft}
+                                        onSwipeRight={onSwipeRight}
+                                        handleSideChange={(side: string) => handleSideChange(side)}
+                                        triggerReset={triggerReset}
+                                        />
+
+                                </View>
                             </View>
                         </View>
                     </View>               
@@ -394,6 +402,17 @@ const styles = StyleSheet.create({
         width: 240,
         height: 240,
         borderRadius: 15,
+    },
+    imageMask: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: 15,
+    overflow: 'hidden',
+    borderColor: '#242120',
+    borderWidth: 4,
+    },
+    backImage: {
+      width: '100%',
+      height: '100%'
     },
     bottomSection: {
         width: '100%',
