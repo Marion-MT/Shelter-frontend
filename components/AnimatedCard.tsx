@@ -9,6 +9,9 @@ import Animated, {
   withSpring,
   useAnimatedReaction,
   runOnJS,
+  Layout,
+  FadeIn,
+  FadeOut
 } from "react-native-reanimated";
 import { ViewStyle } from 'react-native';
 
@@ -38,8 +41,9 @@ export default function AnimatedCard({ isConsequence, leftChoiceText, rightChoic
   const swipeRotation = useSharedValue(0);
 
   const reset = () => {
-    flipRotation.value = 180; // reset back side
     setIsFlipped(true);
+    setSwipeSide('center');
+    flipRotation.value = 180; // reset back side
     translateX.value = 0;
     swipeRotation.value = 0;
 
@@ -50,7 +54,6 @@ export default function AnimatedCard({ isConsequence, leftChoiceText, rightChoic
   }
 
   useEffect(() => {
-    setSwipeSide('center');
     reset();
   }, [triggerReset]);
 
@@ -126,6 +129,7 @@ export default function AnimatedCard({ isConsequence, leftChoiceText, rightChoic
   }));
 
 
+
 // get the information of the swipe side
 const [swipeSide, setSwipeSide] = useState<'left' | 'right' | 'center'>('center');
 
@@ -149,9 +153,26 @@ useAnimatedReaction(
           </Animated.View> :
           // Normal layout
           <Animated.View style={[styles.card, styles.front, frontAnimatedStyle, swipeAnimatedStyle]}>
-              <View style={styles.textSection}>
-                  {swipeSide !== 'center' && <Text style={[styles.textChoice, {textAlign : swipeSide === 'right' ? 'left' : 'right'}]}>{swipeSide === 'right' ? rightChoiceText : leftChoiceText}</Text>}
-              </View>
+
+            <Animated.View
+              layout={Layout.duration(100)} // smooth animation of the text section
+              style={styles.textSection}
+            >
+              {swipeSide !== 'center' &&
+                <Animated.Text  // smooth fade on the text
+                  key={swipeSide} // trigger anim when swipeSide change
+                  entering={FadeIn.duration(150)}
+                  exiting={FadeOut.duration(150)}
+                  style={[
+                    styles.textChoice,
+                    { textAlign: swipeSide === 'right' ? 'left' : 'right' }
+                  ]}
+                >
+                  {swipeSide === 'right' ? rightChoiceText : leftChoiceText}
+                </Animated.Text>
+              }
+            </Animated.View>
+
           </Animated.View>
           }
          

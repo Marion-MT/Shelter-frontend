@@ -44,10 +44,10 @@ export default function EndGameScreen({ navigation, route }: EndGameScreenProps 
                     <View style={styles.darkBackground}>
                         <View style={styles.cardContainer}>
                             <View style={styles.gaugesContainer}>
-                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={user.stateOfGauges.hunger} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={user.stateOfGauges.security} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={user.stateOfGauges.health} indicator={0}/>
-                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={user.stateOfGauges.moral} indicator={0}/>
+                                <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={user.stateOfGauges.hunger} indicator={0} decrease={false}/>
+                                <Gauge icon={require('../assets/icon-security.png')} color='#378ded' percent={user.stateOfGauges.security} indicator={0} decrease={false}/>
+                                <Gauge icon={require('../assets/icon-health.png')} color='#cf5a34' percent={user.stateOfGauges.health} indicator={0} decrease={false}/>
+                                <Gauge icon={require('../assets/icon-moral.png')} color='#6b8a48' percent={user.stateOfGauges.moral} indicator={0} decrease={false}/>
                             </View>
                             <View style={styles.deadWhat}>
                                 <Image source={require('../assets/icon-skull.png')} resizeMode="contain" style={styles.skullLogo} />
@@ -86,7 +86,6 @@ export default function EndGameScreen({ navigation, route }: EndGameScreenProps 
             padding: 12,
         },
         cardContainer: {
-            flex: 1,
             flexDirection: 'column',
             alignItems: 'center',
             backgroundColor : '#342c29',
@@ -94,22 +93,22 @@ export default function EndGameScreen({ navigation, route }: EndGameScreenProps 
             height: '100%',
             borderRadius: 16,
             borderColor: '#554946',
-            borderWidth: 5
+            borderWidth: 5,
         },
         gaugesContainer:{
-        width: '100%',
-        height: '22%',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        paddingHorizontal: 10
+            width: '100%',
+            height: '22%',
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            paddingHorizontal: 10,
         },
         deadWhat: {
-            flex: 1,
             flexDirection: 'column',
             alignItems: 'center',
             width: '90%',
-            height: '50%',
+            height: '41%',
+            marginBottom : 10
         },
         skullLogo: {
             width: '45%',  
@@ -120,34 +119,35 @@ export default function EndGameScreen({ navigation, route }: EndGameScreenProps 
             fontSize: 18,
             fontWeight: 'bold',
             textTransform: 'uppercase',
+            textAlign: 'center',
         },
         deadCause: {
             marginTop: 5,
             fontSize: 23,
             fontWeight: 'bold',
             textTransform: 'uppercase',
+            textAlign: 'center'
         },
         deadResume: {
-            flex: 1,
             width: '90%',
-            height: '35%',
+            height: 180,
             justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#252120',
+            borderRadius: 10,
+            padding : 20
         },
         resumeText: {
-            height: 200,
-            backgroundColor: '#252120',
             color: '#EFDAB7',
             fontWeight: 'bold',
-            padding: 35,
-            borderRadius: 10,
+            fontSize: 16,
+            textAlign: 'center',
         },
         button: {
             alignItems: 'center',
             justifyContent: 'center',
             width: 235,
             height: 60,
-            borderWidth: 1.5,
-            borderColor: 'black',
             borderRadius: 15,
             margin: 15,
         },
@@ -155,6 +155,6 @@ export default function EndGameScreen({ navigation, route }: EndGameScreenProps 
             textTransform: 'uppercase',
             fontSize: 23,
             fontWeight: 'bold',
-            color: 'black',
+            color: '#EFDAB7',
         },
     });
