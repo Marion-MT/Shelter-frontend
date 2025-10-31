@@ -103,6 +103,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
                     <TouchableOpacity onPress={() => handleLogout()} activeOpacity={0.8} style={styles.logout}>
                         <FontAwesome name={'sign-out' as any} size={50} color='#ffe7bf' />
                     </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleNavigateParametres()} activeOpacity={0.8} style={styles.logout}>
+                        <FontAwesome name={'cog' as any} size={50} color='#ffe7bf' />
+                    </TouchableOpacity>
                 </View>
                 <View style={styles.main}>
                     <Text style={styles.title}>shelter</Text>
@@ -112,9 +115,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
                         </TouchableOpacity>}
                         <TouchableOpacity onPress={() => handleNewGame()} style={styles.button} activeOpacity={0.8}>
                             <Text style={styles.btnText}>nouvelle partie</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => handleNavigateParametres()} style={styles.button} activeOpacity={0.8}>
-                            <Text style={styles.btnText}>paramètres</Text>
                         </TouchableOpacity>
                          <TouchableOpacity onPress={() => handleNavigateSucces()} style={styles.button} activeOpacity={0.8}>
                             <Text style={styles.btnText}>succès</Text>
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
         height: 80,
         padding: 30,
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
     },
     logout:{
         width: 55,
