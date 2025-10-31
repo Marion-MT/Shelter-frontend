@@ -10,6 +10,7 @@ type HomeScreenProps = {
 
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
+
 export default function HomeScreen({ navigation }: HomeScreenProps ) {
     const [currentGame, setCurrentGame] = useState(false);
     console.log(currentGame);
@@ -89,7 +90,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
     };
 
     const handleLogout = () => {
-        console.log("pré-signout", user)
+        //console.log("pré-signout", user)
         dispatch(signout())
         navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
     };
@@ -108,12 +109,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
                     {/* <TouchableOpacity onPress={() => handleNavigateParametres()} style={styles.button} activeOpacity={0.8}>
                         <Text style={styles.btnText}>paramètres</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => handleNavigateSucces()} style={styles.button} activeOpacity={0.8}>
-                        <Text style={styles.btnText}>succès</Text>
-                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => handleNavigateCredit()} style={styles.button} activeOpacity={0.8}>
                         <Text style={styles.btnText}>crédits</Text>
                     </TouchableOpacity> */}
+                    <TouchableOpacity onPress={() => handleNavigateSucces()} style={styles.button} activeOpacity={0.8}>
+                        <Text style={styles.btnText}>succès</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => handleLogout()} style={styles.button} activeOpacity={0.8}>
                         <Text style={styles.btnText}>Se deconnecter</Text>
                     </TouchableOpacity>
