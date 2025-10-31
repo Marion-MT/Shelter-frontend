@@ -14,16 +14,14 @@ type achievements = {
     description: string
 }
 
-type TopPlayer = {
-    bestScore: number;
-}
+
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
 export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
     const user = useSelector((state: string) => state.user.value);
     const [succesData, setSuccesData] = useState<achievements[]>([]);
     const [activeTab, setActiveTab] = useState<'personnal'| 'leaderboard'>('personnal');
-    const [topPlayers, setTopPlayers] = useState<TopPlayer[]>([])
+    const [topPlayers, setTopPlayers] = useState<number[]>([])
 
     useEffect(()=>{
         //fetch des succès
@@ -36,12 +34,17 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
         .catch(err => console.error('Erreur fetch succes', err))
 
         //fetch top players
-        fetch(`${BACKEND_ADDRESS}/topScores`)
+        fetch(`${BACKEND_ADDRESS}/users/topScores`, {
+            method: 'GET',
+            headers: {Authorization: `Bearer ${user.token}`}
+        })
         .then(response => response.json())
         .then(data=>{
-            console.log('topscore====>',data)
+            //console.log('topscore====>',data)
             setTopPlayers(data.topScores)
+            //console.log('TopPlayer', topPlayers)
         })
+        .catch(err=>console.error('Erreur fetch Top Players', err))
     },[])
 
     const succes = succesData.map((data, i)=> {
@@ -56,7 +59,21 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
         )
     })
 
+    const topPlayersList = topPlayers.map((score, i) => {
+        const medalColor = i === 0 ? '#FFD700' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : '#554946';
+        return(
+            <View key={i} style={[styles.playerItem, i < 3 && styles.podiumItem]}>
+                <View style={styles.playerRank}>
+                    <View style={[styles.rankBadge, {backgroundColor: medalColor}]}>
+                        <Text style={styles.rankNumber}>{i+1}</Text>
+                    </View>
+                    <Text style={styles.playerScore}>{score} jours</Text>
+                    
+                </View>
+            </View>
+        )
 
+    })
 
     return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.container}>
@@ -69,7 +86,7 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
                         <View style={styles.tabContainer}>
                             <TouchableOpacity style={[styles.tab, activeTab==='personnal' && styles.activeTab]}
                             onPress={()=>setActiveTab('personnal')}>
-                                <Text style={[styles.text, activeTab === 'personnal' && styles.activeTabText]}>BEST SCORE</Text>
+                                <Text style={[styles.tabText, activeTab === 'personnal' && styles.activeTabText]}>BEST SCORE</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={[styles.tab, activeTab === 'leaderboard' && styles.activeTab]}
                             onPress={()=>setActiveTab('leaderboard')}>
@@ -80,24 +97,27 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
                         </View>
 
                         {activeTab === 'personnal' ? (
-                            <>
+                            
                                 <View style={styles.daysContainer}>
                                     <Text style={styles.days}>{user.bestScore}</Text>
                                 </View>
-                            </>
+                            
                         ) : (
-                            <>
-                                <Text style={styles.leaderboardTitle}>Classement des meilleurs joueurs</Text>
-                                 {topPlayers.length === 0 ? (
-                                    <View style={styles.emptyLeaderboard}>
-                                            <FontAwesome name="users" size={40} color="#8B7355" />
-                                            <Text style={styles.emptyText}>Aucun joueur dans le classement</Text>
-                                        </View>
-                                    ) : (
-                                        topPlayers
-                                    )}
-                            </>
-                        )}
+                            
+                                <View style={styles.leaderboardContainer}>
+        <Text style={styles.leaderboardTitle}>Top Scores</Text>
+        <ScrollView style={styles.leaderboardScroll} contentContainerStyle={styles.leaderboardContent}>
+            {topPlayers.length === 0 ? (
+                <View style={styles.emptyLeaderboard}>
+                    <FontAwesome name="users" size={30} color="#8B7355" />
+                    <Text style={styles.emptyText}>Aucun score</Text>
+                </View>
+            ) : (
+                topPlayersList
+            )}
+        </ScrollView>
+    </View>
+)}
                         <View style={styles.achievement}>
                             <Text style={styles.achievementText}>LISTE DES SUCCES</Text>
                         </View>
@@ -149,12 +169,6 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         borderColor: '#554946',
         borderWidth: 5
-    },
-    text: {
-        marginTop: 25,
-        color: '#EFDAB7',
-        fontSize: 18,
-        fontWeight: 'bold',
     },
     daysContainer: {
         alignItems: 'center',
@@ -246,25 +260,8 @@ const styles = StyleSheet.create({
         color: '#EFDAB7',
         fontWeight: 'bold',
     },
-     leaderboardTitle: {
-        marginTop: 20,
-        marginBottom: 10,
-        color: '#EFDAB7',
-        fontSize: 18,
-        fontWeight: 'bold',
-        
-    },
-    playerItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '90%',
-        backgroundColor: '#EFDAB7',
-        marginTop: 15,
-        borderRadius: 10,
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-    },
+     
+    
     podiumItem: {
         borderWidth: 2,
         borderColor: '#FFD700',
@@ -286,11 +283,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
     },
-    playerName: {
-        color: '#554946',
-        fontSize: 16,
-        fontWeight: '600',
-    },
     playerScore: {
         color: '#554946',
         fontSize: 24,
@@ -307,5 +299,34 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: 'center',
     },
+
+    leaderboardContainer: {
+    marginTop: 15,
+    width: '90%',
+    height: 150,
+},
+leaderboardTitle: {
+    color: '#EFDAB7',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+},
+
+leaderboardScroll: {
+    flex: 1,
+},
+leaderboardContent: {
+    gap: 8,
+},
+playerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#EFDAB7',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+},
 
 });
