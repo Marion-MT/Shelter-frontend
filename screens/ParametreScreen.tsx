@@ -75,13 +75,16 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
 
     return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.container}>
+            <View style={styles.header}>
+                <TouchableOpacity style={styles.backButton} onPress={() => {playSound(); handleNavigate();}}>
+                    <Image source={require('../assets/icon-arrow.png')} style={styles.leftArrow} />
+                </TouchableOpacity>
+            </View>
             <View style={styles.main}>
-                <Pressable onPress={() => handleNavigate()}>
-                    <Image source={require('../assets/icon-arrow.png')} style={styles.arrow}/>
-                </Pressable>
                 <View style={styles.darkBackground}>
                     <View style={styles.cardContainer}>
                         <View style={styles.setupContainer}>
+                            <Text style={styles.title} >PARAMÈTRES</Text>
                             <Text style={styles.text}>Volume : {volume}</Text>
                             <Slider
                                 value={volume}
@@ -90,8 +93,8 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
                                 minimumValue={0}
                                 step={2}
                                 allowTouchTrack
-                                trackStyle={{ height: 25, borderRadius: 12.5, borderColor: 'black', borderWidth: 2.5, backgroundColor: '#524743' }}
-                                thumbStyle={{ height: 30, width: 30, borderColor: 'black', borderWidth: 2.5, backgroundColor: '#FFE8BF' }}
+                                trackStyle={{ height: 25, borderRadius: 12.5, backgroundColor: '#524743' }}
+                                thumbStyle={{ height: 32, width: 32, backgroundColor: '#FFE8BF' }}
                                 minimumTrackTintColor="#388FF0"
                                 maximumTrackTintColor="#524743"
                                 style={styles.volumeSlider}
@@ -163,14 +166,31 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        flex: 1
+    },
+    header: {
+        height: undefined,
+        width : '100%',
+        paddingHorizontal: 40,
+        paddingTop: 30,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    backButton: {
+        width: 40,
+        height: 40
+    },
+    leftArrow:{
+        width: '100%',
+        height: '100%'
     },
     main: {
         width: '100%',
+        height: undefined,
         paddingHorizontal: 36,
-        paddingVertical: 30,
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+        marginTop: 50
     },
     arrow: {
         width: 75,
@@ -180,7 +200,7 @@ const styles = StyleSheet.create({
     darkBackground:{
         backgroundColor : '#242120',
         width: '100%',
-        height: 600,
+        height: '82%',
         borderRadius: 20,
         padding: 12,
     },
@@ -196,17 +216,25 @@ const styles = StyleSheet.create({
         borderColor: '#554946',
         borderWidth: 5
     },
+    title : {
+        color: '#ffe7bf',
+        fontFamily: 'ArialRounded',
+        fontSize: 26,
+        textAlign: 'center',
+        marginBottom: 5
+    },
     setupContainer: {
         justifyContent: 'center',
         alignItems: 'stretch',
         width: '80%',
+        paddingTop :30
     },
     volumeSlider: {
         width: '100%',
     },
     text: {
         color: '#FFE8BF',
-        fontSize: 25,
+        fontSize: 22,
         fontWeight: 'bold',
         marginBottom: 15,
         marginTop: 25,

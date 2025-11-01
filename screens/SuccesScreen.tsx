@@ -128,10 +128,12 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
 
         return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.container}>
-            <View style={styles.main}>
-                <TouchableOpacity style={styles.backButton} onPress={() => {playSound(); navigation.navigate('Home', { screen: 'Menu'})}}>
+             <View style={styles.header}>
+                <TouchableOpacity style={styles.backButton} onPress={() => {playSound(); navigation.navigate('Home', { screen: 'Menu'});}}>
                     <Image source={require('../assets/icon-arrow.png')} style={styles.leftArrow} />
                 </TouchableOpacity>
+            </View>
+            <View style={styles.main}>
                 <View style={styles.darkBackground}>
                      <View style={styles.cardContainer}>
                          <View style={styles.tabContainer}>
@@ -184,10 +186,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    header: {
+        height: undefined,
+        width : '100%',
+        paddingHorizontal: 40,
+        paddingTop: 30,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
     backButton: {
         width: 40,
-        height: 40,
-        marginBottom: 5,
+        height: 40
     },
     leftArrow:{
         width: '100%',

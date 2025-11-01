@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setGauges, setCurrentCard, setCurrentNumberDays, Card } from "../reducers/user";
 
 import { Audio } from 'expo-av';
-import { getImageByType } from '../modules/imagesSelector';
+import { getImageByType, getImageByPool } from '../modules/imagesSelector';
 
 type GameScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -67,10 +67,9 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const foodBlink = useSharedValue(1);
 
     const [backgroundMusic, setBackgroundMusic] = useState<Audio.Sound | null>(null);
-    const [cardSound, setCardSound] = useState<Audio.Sound | null>(null);
 
     // Fonction pour charger et jouer la musique de fond
-    const loadBackgroundMusic = async () => {
+  const loadBackgroundMusic = async () => {
         const { sound } = await Audio.Sound.createAsync(
         require('../assets/sounds/Free.mp3'),
         { isLooping: true, volume: 0.25 }
@@ -81,47 +80,18 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
         await sound.playAsync();
     };
 
-    // Arrête la musique quand la partie est terminée
-    const stopBackgroundMusic = async () => {
-        if (backgroundMusic) {
-        await backgroundMusic.stopAsync();
-        }
-    };
-
-    // Fonction pour charger le son des cartes
-    const loadCardSound = async () => {
-        const { sound } = await Audio.Sound.createAsync(
-        require('../assets/sounds/woosh-v2.mp3'),        
-        { volume: 0.25 }
-        );
-        setCardSound(sound);
-    };
-
-    // Joue le son de validation des cartes
-  const playCardSound = async () => {
-    if (cardSound) {
-      await cardSound.replayAsync();
-    }
-  };
-
-    // Charge les sons au montage du composant
+    // Charge et lance la musique au montage du composant
     useEffect(() => {
         loadBackgroundMusic();
-        loadCardSound();
         
         return () => {
-            // Nettoyer les ressources lors de la fermeture du composant
             if (backgroundMusic) {
                 backgroundMusic.unloadAsync();
-            }
-            if (cardSound) {
-                cardSound.unloadAsync();
             }
         };
     }, []);
 
-
-    // Arrête la musique lorsque l'utilisateur change d'écran
+    // Arrêter la musique lorsque l'utilisateur change d'écran
     useFocusEffect(
         useCallback(() => {
             return () => {
@@ -162,7 +132,6 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
     const triggerGameover = (type: string, hook: string, phrase: string, description: string, achievements: [Object] ) => {
         setTimeout(() => {
-            stopBackgroundMusic(); // Stop the background music
             navigation.navigate('EndGame', { screen: 'EndGame', type: type, hook: hook, phrase: phrase, description: description, achievements: achievements  });
         }, 1000);
     }
@@ -187,7 +156,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     return;
                 }
 
-                console.log(data);
+                //console.log(data);
 
                 setLastResponse(data);
 
@@ -207,7 +176,6 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                 if(data.gameover || !data.card){
                     //console.log(data.death.type + ' ' + data.death.title.hook + ' ' + data.death.title.phrase + ' ' + data.death.description);
                     triggerGameover(data.death.type, data.death.title.hook, data.death.title.phrase, data.death.description, data.achievements);
-                    console.log('unlocked achievements = ', data.achievements);
                     return;
                 }
 
@@ -290,8 +258,16 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const healthIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.health || 0) : Math.abs(currentCard?.left?.effect.health || 0));
     const moralIndicator = hideIndicators ? 0 : (currentSide === 'right' ?  Math.abs(currentCard?.right?.effect.moral || 0) : Math.abs(currentCard?.left?.effect.moral || 0));
 
-    const keyParts = currentCard.key.split('-')
-    const image = getImageByType(keyParts[0]);
+    // Image to display on the card
+    let pool = currentCard.right.trigger || currentCard.left.trigger || currentCard.pool;
+
+    if(pool === 'event'){
+        pool = currentCard.right.nextPool || currentCard.left.nextPool || 'event';
+    }
+
+
+    //const keyParts = currentCard.key.split('-')
+    const image = getImageByPool(pool);
 
 
     // Blick anim when food is empty
@@ -421,16 +397,16 @@ const styles = StyleSheet.create({
     },
     main: {
         width: '100%',
-        height: undefined,
+        height: "75%", /*undefinded*/
         paddingHorizontal: 36,
         paddingVertical: 30
     },
     darkBackground:{
         backgroundColor : '#242120',
         width: '100%',
-        height: 620,
+        height: '100%', /*620*/
         borderRadius: 20,
-        padding: 12
+        padding: 12,
     },
     cardContainer: {
         backgroundColor : '#342c29',
@@ -468,7 +444,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         paddingTop: 20
-
     },
     cardStack:{
         backgroundColor: '#242120',
@@ -477,11 +452,11 @@ const styles = StyleSheet.create({
         borderRadius: 15,
     },
     imageMask: {
-    ...StyleSheet.absoluteFillObject,
-    borderRadius: 15,
-    overflow: 'hidden',
-    borderColor: '#242120',
-    borderWidth: 4,
+        ...StyleSheet.absoluteFillObject,
+        borderRadius: 15,
+        overflow: 'hidden',
+        borderColor: '#242120',
+        borderWidth: 4,
     },
     backImage: {
       width: '100%',
@@ -490,7 +465,7 @@ const styles = StyleSheet.create({
     bottomSection: {
         width: '100%',
         height: undefined,
-        paddingHorizontal: 36,
+        paddingHorizontal: 36
     },
     foodSection: {
         width: '100%',

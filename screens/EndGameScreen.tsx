@@ -20,8 +20,6 @@ export default function EndGameScreen({ navigation, route }: EndGameScreenProps 
     const { type, hook, phrase, description, achievements } = route.params;
     const user = useSelector((state: string) => state.user.value);
 
-    console.log("EndGame achievements = ", achievements);
-
     const handleNavigate = () => {
         navigation.navigate('RecapGame', { screen: 'RecapGame', achievements: achievements });
     };

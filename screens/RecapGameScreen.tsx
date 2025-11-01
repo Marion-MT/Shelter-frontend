@@ -28,8 +28,6 @@ export default function RecapGameScreen({ navigation, route }: RecapGameScreenPr
 
     const { achievements } = route.params;
 
-    console.log("RecapGame achievements = ", achievements);
-
     // Update best score in reduce
     useFocusEffect(
         useCallback(() => {

@@ -26,7 +26,7 @@ export default function CreditScreen({ navigation }: CreditScreenProps ) {
 
     return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.container}>
-            <View style={styles.hud}>
+            <View style={styles.header}>
                 <TouchableOpacity style={styles.backButton} onPress={() => {playSound(); navigation.navigate('Home', { screen: 'Menu'});}}>
                     <Image source={require('../assets/icon-arrow.png')} style={styles.leftArrow} />
                 </TouchableOpacity>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    hud: {
+    header: {
         height: undefined,
         width : '100%',
         paddingHorizontal: 40,
