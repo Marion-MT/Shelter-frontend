@@ -72,7 +72,7 @@ export default function RecapGameScreen({ navigation, route }: RecapGameScreenPr
                         </View>
                         <View style={styles.bestScore}>
                             <Image source={require('../assets/icon-star.png')} style={styles.logo} />
-                            <Text style={styles.bestScoreText}>Last Record : {previousBestScore} jours</Text>
+                            <Text style={styles.bestScoreText}>Last Record : {previousBestScore} jour{previousBestScore > 1 ? 's' : ''}</Text>
                         </View>
                         {succes.length === 0 ? (
                         <ScrollView contentContainerStyle={styles.scrollView}>
@@ -97,7 +97,7 @@ export default function RecapGameScreen({ navigation, route }: RecapGameScreenPr
                     <Text style={styles.daysText}>Jours</Text>
                     <View style={styles.bestScore}>
                         <Image source={require('../assets/icon-star.png')} style={styles.logo} />
-                        <Text style={styles.bestScoreText}>Record : {user.bestScore} jours</Text>
+                        <Text style={styles.bestScoreText}>Record : {user.bestScore} jour{user.bestScore > 1 ? 's' : ''}</Text>
                     </View>
                     {succes.length === 0 ? (
                         <ScrollView contentContainerStyle={styles.scrollView}>
