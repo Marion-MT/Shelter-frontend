@@ -20,6 +20,10 @@ type achievements = {
     image: string;
 }
 
+type TopPlayer = {
+    bestScore: number,
+    username: string,
+}
 
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
@@ -29,8 +33,8 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
     const user = useSelector((state: string) => state.user.value);
     const [succesData, setSuccesData] = useState<achievements[]>([]);
     const [unlockedAchievement, setUnlockedAchievement] = useState<achievements[]>([]);
-    const [activeTab, setActiveTab] = useState<'personnal'| 'leaderboard'>('personnal');
-    const [topPlayers, setTopPlayers] = useState<number[]>([])
+    const [activeTab, setActiveTab] = useState<'personnal'| 'leaderboard'>('leaderboard');
+    const [topPlayers, setTopPlayers] = useState<TopPlayer[]>([])
 
     // Initialisation du fichier audio
     const player = useAudioPlayer(audioSource);
@@ -125,74 +129,113 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
   );*/
 });
 
-    const topPlayersList = topPlayers.map((score, i) => {
+    const topPlayersList = topPlayers.map((player, i) => {
         const medalColor = i === 0 ? '#FFD700' : i === 1 ? '#C0C0C0' : i === 2 ? '#CD7F32' : '#554946';
-        return(
-            <View key={i} style={[styles.playerItem, i < 3 && styles.podiumItem]}>
-                <View style={styles.playerRank}>
-                    <View style={[styles.rankBadge, {backgroundColor: medalColor}]}>
-                        <Text style={styles.rankNumber}>{i+1}</Text>
-                    </View>
-                    <Text style={styles.playerScore}>{score} jours</Text>
-                    
-                </View>
-            </View>
-        )
+        return (
+    <View key={i} style={[styles.playerItem, i < 3 && styles.podiumItem]}>
+      <View style={styles.playerRank}>
+        <View style={[styles.rankBadge, { backgroundColor: medalColor }]}>
+          <Text style={styles.rankNumber}>{i + 1}</Text>
+        </View>
 
-    })
+        <View style={styles.playerTextContainer}>
+          <Text style={styles.playerUsername}>{player.username}</Text>
+          <Text style={styles.playerScore}>{player.bestScore} <Text style={styles.jours}>jours</Text></Text>
+        </View>
+      </View>
+    </View>
+  );
+});
 
         return (
-        <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.container}>
-             <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={() => {playSound(); navigation.navigate('Home', { screen: 'Menu'});}}>
-                    <Image source={require('../assets/icon-arrow.png')} style={styles.leftArrow} />
-                </TouchableOpacity>
-            </View>
-            <View style={styles.main}>
-                <View style={styles.darkBackground}>
-                     <View style={styles.cardContainer}>
-                         <View style={styles.tabContainer}>
-                            <TouchableOpacity style={[styles.tab, activeTab==='personnal' && styles.activeTab]}
-                            onPress={()=>{playSound(); setActiveTab('personnal');}}>
-                                <Text style={[styles.tabText, activeTab === 'personnal' && styles.activeTabText]}>BEST SCORE</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={[styles.tab, activeTab === 'leaderboard' && styles.activeTab]}
-                            onPress={()=>{playSound(); setActiveTab('leaderboard');}}>
-                                <Text style={[styles.tabText, activeTab === 'leaderboard' && styles.activeTabText]}>
-                                    TOP PLAYERS
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                        {activeTab === 'personnal' ? (
-            <View style={styles.daysContainer}>
-                <Text style={styles.days}>{user.bestScore}</Text>
-            </View>
-        ) : (
-            <View style={styles.leaderboardContainer}>
-                <Text style={styles.leaderboardTitle}>Top Scores</Text>
-                <ScrollView style={styles.leaderboardScroll} contentContainerStyle={styles.leaderboardContent} showsHorizontalScrollIndicator={false}>
-                    {topPlayers.length === 0 ? (
-                    <View style={styles.emptyLeaderboard}>
-                        <FontAwesome name="users" size={30} color="#8B7355" />
-                        <Text style={styles.emptyText}>Aucun score</Text>
-                    </View>
-                    ) : (
-                    topPlayersList
-                    )}
-                </ScrollView>
-            </View>
-         )}
-                        <View style={styles.achievement}>
-                            <Text style={styles.achievementText}>LISTE DES SUCCÈS</Text>
-                        </View>
-                        <ScrollView contentContainerStyle={styles.scrollView}>
-                        {succes}
-                        </ScrollView>
-                    </View>
-                </View>
-            </View>
-        </ImageBackground>
-    )
+  <ImageBackground
+    source={require('../assets/background.jpg')}
+    resizeMode="cover"
+    style={styles.container}
+  >
+    <View style={styles.header}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => {
+          playSound();
+          navigation.navigate('Home', { screen: 'Menu' });
+        }}
+      >
+        <Image source={require('../assets/icon-arrow.png')} style={styles.leftArrow} />
+      </TouchableOpacity>
+    </View>
+
+    <View style={styles.main}>
+      <View style={styles.darkBackground}>
+        <View style={styles.cardContainer}>
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'personnal' && styles.activeTab]}
+              onPress={() => {
+                playSound();
+                setActiveTab('personnal');
+              }}
+            >
+              <Text style={[styles.tabText, activeTab === 'personnal' && styles.activeTabText]}>
+                STATS
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'leaderboard' && styles.activeTab]}
+              onPress={() => {
+                playSound();
+                setActiveTab('leaderboard');
+              }}
+            >
+              <Text style={[styles.tabText, activeTab === 'leaderboard' && styles.activeTabText]}>
+                SUCCÈS
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {activeTab === 'personnal' && (
+            <>
+              <View style={styles.achievement}>
+                <Text style={styles.achievementText}>Record personnel</Text>
+              </View>
+
+              <View style={styles.daysContainer}>
+                {user.bestScore === 0 ? (
+                    <Text style={styles.days}>{user.bestScore}</Text>
+                ) : (
+                    <Text style={styles.days}>{user.bestScore} <Text style={styles.jours}>jours</Text></Text>
+                )}
+              </View>
+
+              <View style={styles.achievement}>
+                <Text style={styles.achievementText}>Top Players</Text>
+              </View>
+
+              <View style={styles.leaderboardContainer}>
+                                      
+                      {topPlayersList}
+                 
+              </View>
+            </>
+          )}
+
+          {activeTab === 'leaderboard' && (
+            <>
+              <View style={styles.achievement}>
+                <Text style={styles.achievementText}>Liste des succès</Text>
+              </View>
+
+              <ScrollView contentContainerStyle={styles.scrollView}>
+                {succes}
+              </ScrollView>
+            </>
+          )}
+        </View>
+      </View>
+    </View>
+  </ImageBackground>
+);
 }
 
 const styles = StyleSheet.create({
@@ -306,16 +349,16 @@ const styles = StyleSheet.create({
         color: '#EFDAB7',
         fontFamily: 'ArialRounded',
     },
-     
-    
     podiumItem: {
         borderWidth: 2,
         borderColor: '#FFD700',
+        
     },
     playerRank: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
+        
     },
     rankBadge: {
         width: 32,
@@ -333,6 +376,7 @@ const styles = StyleSheet.create({
         color: '#554946',
         fontSize: 24,
         fontFamily: 'ArialRounded',
+        fontWeight: 'bold'
     },
     emptyLeaderboard: {
         alignItems: 'center',
@@ -349,7 +393,7 @@ const styles = StyleSheet.create({
     leaderboardContainer: {
     marginTop: 15,
     width: '90%',
-    height: 150,
+    height: '100%',
 },
 leaderboardTitle: {
     color: '#EFDAB7',
@@ -373,6 +417,23 @@ playerItem: {
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 15,
+    marginBottom: 10
+
+},
+playerUsername:{
+ color: '#554946',
+  fontSize: 12, 
+  opacity: 0.8,
+},
+jours:{
+    color: 'black',
+    fontSize: 15,
+    fontFamily: 'ArialRounded',
+    fontWeight: 'light'
+}, 
+playerTextContainer: {
+  flexDirection: 'column', 
+  alignItems: 'flex-start',
 },
 
 });
