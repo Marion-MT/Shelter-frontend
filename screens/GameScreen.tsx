@@ -71,7 +71,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     // Fonction pour charger et jouer la musique de fond
   const loadBackgroundMusic = async () => {
         const { sound } = await Audio.Sound.createAsync(
-        require('../assets/sounds/Free.mp3'),
+        require('../assets/sounds/inhuman-post-apocalyptic-dark-ambient.mp3'),
         { isLooping: true, volume: 0.25 }
         );
         setBackgroundMusic(sound);
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
         height: undefined,
         width : '100%',
         paddingHorizontal: 40,
-        paddingTop: 30,
+        paddingTop: 40,
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: "75%", /*undefinded*/
         paddingHorizontal: 36,
-        paddingVertical: 30
+        paddingVertical: 20
     },
     darkBackground:{
         backgroundColor : '#242120',
