@@ -13,7 +13,7 @@ type SplashscreenProps = {
 }
 
 
-export default function ProfileScreen({ navigation }) {
+export default function SplashscreenScreen({ navigation }) {
 
   const translateX = useSharedValue(400); // at the launch, the title is outside the screen
 
@@ -23,10 +23,15 @@ export default function ProfileScreen({ navigation }) {
       }, 200);
 
       setTimeout(() => {
-          navigation.navigate('Connexion', { screen: 'ConnexionScreen'  });
+          handleNavigation();
       }, 3000);
 
   }, []);
+
+  const handleNavigation = () => {
+    navigation.navigate('Introduction', { screen: 'IntroductionScreen'  });
+    //navigation.navigate('Connexion', { screen: 'ConnexionScreen'  });
+  }
 
   const animatedTitle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }]
@@ -35,7 +40,7 @@ export default function ProfileScreen({ navigation }) {
 
  return (
    <ImageBackground source={require('../assets/Splashscreen.jpg')} resizeMode="cover" style={styles.container}>
-      <Pressable onPress={() => navigation.navigate('Connexion', { screen: 'ConnexionScreen' })} style={styles.main}>
+      <Pressable onPress={() => handleNavigation()} style={styles.main}>
         <Animated.Text entering={FadeIn.duration(1000)} style={[styles.title, animatedTitle]}>
         Shelter
         </Animated.Text>
