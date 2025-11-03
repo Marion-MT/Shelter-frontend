@@ -6,7 +6,6 @@ import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useDispatch } from "react-redux";
 import { signin } from "../reducers/user";
 
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 
 
@@ -14,19 +13,19 @@ type ConnexionScreenProps = {
     navigation: NavigationProp<ParamListBase>;
 }
 
-//<Entypo name="eye-with-line" size={24} color="black" />,
-//<Entypo name="eye" size={24} color="black" />
+
 // Grabbed from emailregex.com
 const EMAIL_REGEX: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
-const EMAIL_SIGNIN = process.env.EXPO_PUBLIC_EMAIL_SIGNIN
+const USERNAME_SIGNIN = process.env.EXPO_PUBLIC_USERNAME_SIGNIN
 const PWD_SIGNIN = process.env.EXPO_PUBLIC_PWD_SIGNIN
 
 export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
        
-    const [email, setEmail] = useState(`${EMAIL_SIGNIN}`);
+    const [username, setUsername] = useState(`${USERNAME_SIGNIN}`);
     const [password, setPassword] = useState(`${PWD_SIGNIN}`);
+    const [usernameSignup, setUsernameSignup] = useState(``);
     const [emailSignup, setEmailSignup] = useState('');
     const [passwordSignup, setPasswordSignup] = useState('');
     const [emailError, setEmailError] = useState(false);
@@ -39,20 +38,16 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
     const dispatch = useDispatch();
 
     const handleSignin = () => {
-        console.log("handleSignin");
             SetSigninError('');
-            if(!email || !password){
+            if(!username || !password){
                 SetSigninError('Veuillez remplir tous les champs');
                 return;
             }
-             if(!EMAIL_REGEX.test(email)){
-                SetSigninError('Email invalide')
-                return;
-             }
+            
             fetch(`${BACKEND_ADDRESS}/users/signin`, {
                 method: 'POST',
                 headers: {'Content-Type' : 'application/json'},
-                body: JSON.stringify({email, password})
+                body: JSON.stringify({username, password})
             })
             .then(response => {console.log("response received"); return response.json()})
             .then(data => {
@@ -60,8 +55,8 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                 if (data.result){
                     console.log("data signin =>",data)
                     //stokage du token et redirection
-                    dispatch(signin({token : data.token, email}))
-                    setEmail('')
+                    dispatch(signin({token : data.token, username, email: data.email}))
+                    setUsername('')
                     setPassword('')
                     SetSigninError('')
                     navigation.navigate('Home', { screen: 'Home' });
@@ -79,13 +74,18 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
         const handleSignup = () => {
             setEmailError(false);
             setPasswordError('');
-            setSignupError('')
+            setSignupError('');
+            setUsernameSignup('');
 
             if (!EMAIL_REGEX.test(emailSignup)){
                 setEmailError(true);
                 return;
             }
 
+            if (!usernameSignup){
+                setSignupError("Vous devez saisir un username")
+                return
+            }
             if (!passwordSignup || passwordSignup.length < 3){
                 setPasswordError("Le mot de passe doit contenir au moins 3 caratères")
                 return
@@ -94,13 +94,14 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                 fetch(`${BACKEND_ADDRESS}/users/signup`,{
                     method: "POST",
                     headers:{'Content-Type' : 'application/json',},
-                    body: JSON.stringify({email: emailSignup, password: passwordSignup})
+                    body: JSON.stringify({email: emailSignup, username: usernameSignup, password: passwordSignup})
                 }).then(response => response.json())
                 .then(data => {
                     console.log("création de compte", data.result);
                     if (data.result === true){
-                        dispatch(signin({token : data.token, email: emailSignup}))
+                        dispatch(signin({token : data.token, username : usernameSignup, email: emailSignup}))
                         setEmailSignup('')
+                        setUsername('')
                         setPasswordSignup('')
                         setEmailError(false)
                         setSignupError('')
@@ -109,8 +110,7 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                         navigation.navigate('Home', { screen: 'Home' });
                     } else {
                         //console.error('Erreur de connexion:', data.error)
-                        setSignupError('Email déjà utilisé')
-                        setEmailSignup("")
+                        setSignupError('Username déjà utilisé')
                         setPassword('')
                     }
                 })
@@ -129,12 +129,12 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                     <Text style={styles.title}>Connexion</Text>
                     <TextInput
                         style={styles.input}
-                        placeholder="Email"
+                        placeholder="Username"
                         autoCapitalize="none"
-                        keyboardType="email-address"
-                        autoComplete="email"
-                        onChangeText={(value) => {setEmail(value); SetSigninError('')}}
-                        value={email}
+                        keyboardType='default'
+                        autoComplete="username"
+                        onChangeText={(value) => {setUsername(value); SetSigninError('')}}
+                        value={username}
                     />
 
                     <View style={styles.passwordContainer}>
@@ -159,7 +159,7 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                         <Text style={styles.buttonText}>Go</Text>
                     </TouchableOpacity>
                     <Text style={styles.title2}>Pas encore de compte ?</Text>
-                    <TouchableOpacity onPress={() => {setIsSignupVisible(true); setEmail(''); setPassword('')}} style={styles.button} activeOpacity={0.8}>
+                    <TouchableOpacity onPress={() => {setIsSignupVisible(true); setUsername(''); setPassword('')}} style={styles.button} activeOpacity={0.8}>
                         <Text style={styles.buttonText}>Créer un compte</Text>
                     </TouchableOpacity>
                     <Modal
@@ -179,6 +179,15 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                                     autoCapitalize="none"
                                     keyboardType="email-address"
                                     autoComplete="email"
+                                />
+                                <TextInput
+                                    style={styles.inputModal}
+                                    placeholder="Username"
+                                    autoCapitalize="none"
+                                    keyboardType='default'
+                                    autoComplete="username"
+                                    onChangeText={(value) => {setUsernameSignup(value); SetSigninError('')}}
+                                    value={usernameSignup}
                                 />
                                 <View style={styles.passwordContainerModal}>
                                     <TextInput 
@@ -204,7 +213,7 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                                     <TouchableOpacity style={styles.btn} onPress={handleSignup}>
                                         <Text style={styles.buttonTextModal}>Valider</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity style={styles.btn} onPress={()=> {setIsSignupVisible(false); setEmailSignup(''); setPasswordSignup('')}}>
+                                    <TouchableOpacity style={styles.btn} onPress={()=> {setIsSignupVisible(false); setEmailSignup(''); setUsernameSignup(''); setPasswordSignup('')}}>
                                         <Text style={styles.buttonTextModal}>Annuler</Text>
                                     </TouchableOpacity>
                                 </View>
