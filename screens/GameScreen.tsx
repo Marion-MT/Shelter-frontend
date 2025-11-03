@@ -71,7 +71,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     // Fonction pour charger et jouer la musique de fond
   const loadBackgroundMusic = async () => {
         const { sound } = await Audio.Sound.createAsync(
-        require('../assets/sounds/Free.mp3'),
+        require('../assets/sounds/inhuman-post-apocalyptic-dark-ambient.mp3'),
         { isLooping: true, volume: 0.25 }
         );
         setBackgroundMusic(sound);
