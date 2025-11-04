@@ -93,20 +93,13 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
         AudioManager.setMusicMuted(!data.settings.soundOn);
         AudioManager.setEffectsMuted(!data.settings.btnSoundOn);
         AudioManager.setMusicVolume(data.settings.volume);
-
-        Alert.alert('Paramètres sauvegardés')
+        navigation.navigate('Home', { screen: 'Home' });
             } else {
             console.log('Erreur côté serveur :', data.error);
             }
         } catch (error) {
             console.error('Erreur de requête PUT /settings :', error);
         }
-    };
-
-   
-    const handleNavigate = () => {
-        AudioManager.playEffect('click');
-        navigation.navigate('Home', { screen: 'Home' });
     };
 
     const handleResetAccount = () => {
@@ -133,7 +126,7 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
     return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton} onPress={() => {AudioManager.playEffect('click'); handleNavigate();}}>
+                <TouchableOpacity style={styles.backButton} onPress={() => {AudioManager.playEffect('click'); handleSaveSettings();}}>
                     <Image source={require('../assets/icon-arrow.png')} style={styles.leftArrow} />
                 </TouchableOpacity>
             </View>
@@ -177,12 +170,6 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
                                 />
                             </View>
                         </View>
-                        <TouchableOpacity onPress={() => {AudioManager.playEffect('click'); handleSaveSettings()}}>
-                            <View style={styles.btnContainerSave}>
-                                <Text style={styles.btnText}>Sauvegarder</Text>
-                                <Text style={styles.btnText}>les paramètres</Text>
-                            </View>
-                        </TouchableOpacity>
                         <TouchableOpacity onPress={() => {AudioManager.playEffect('click'); setModalVisible(true);}}>
                             <View style={styles.btnContainer}>
                                 <Text style={styles.btnText}>réinitialisation</Text>
@@ -307,23 +294,11 @@ const styles = StyleSheet.create({
         height: 80,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#D05A34',
+        backgroundColor: '#242120',
         borderColor: 'black',
         borderWidth: 1.5,
         borderRadius: 12,
-        marginBottom: 15,
-    },
-    btnContainerSave: {
-        width: 210,
-        height: 80,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#74954E',
-        borderColor: 'black',
-        borderWidth: 1.5,
-        borderRadius: 12,
-        marginBottom: 5,
-        marginTop: 15,
+        marginBottom: 25,
     },
     btnText: {
         color: '#FFE8BF',

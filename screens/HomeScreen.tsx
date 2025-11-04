@@ -45,6 +45,12 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
         }, [])
     );
 
+    useFocusEffect(
+        useCallback(() => {
+            AudioManager.playBackground();
+        }, [])
+    );
+
     const handleCurrentGame = () => {
         fetchWithAuth(`/games/current`, {
             method: 'GET',

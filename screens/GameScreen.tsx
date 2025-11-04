@@ -69,12 +69,14 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
     useFocusEffect(
         useCallback(() => {
-            AudioManager.pauseBackground();
-            AudioManager.playBackgroundGame();
-            return () =>{
-                AudioManager.pauseBackgroundGame();
-            }
-        }, [])
+
+        AudioManager.playBackgroundGame();
+
+        return () => {
+            AudioManager.pauseBackgroundGame();
+            AudioManager.playBackground();
+        };
+    }, [])
     );
 
     const resetGame = () => {
