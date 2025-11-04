@@ -1,12 +1,13 @@
 import { Audio } from 'expo-av';
 
-type SoundKey = 'background' | 'scroll' | 'validate' | 'click';
+type SoundKey = 'background' | 'scroll' | 'validate' | 'click' | 'backgroundGame';
 
 const soundFiles: Record<SoundKey, any> = {
   background: require('../assets/sounds/background.mp3'),
   scroll: require('../assets/sounds/scroll.mp3'),
   validate: require('../assets/sounds/validate.mp3'),
   click: require('../assets/sounds/click.mp3'),
+  backgroundGame: require('../assets/sounds/backgroundGame.mp3'),
 };
 
 class AudioManager {
@@ -51,8 +52,29 @@ class AudioManager {
     }
   }
 
+   // --- Musique de fond pour les parties ---
+  static async playBackgroundGame() {
+    if (this.musicMuted) return;
+    const sound = this.sounds.backgroundGame;
+    if (sound) {
+      const status = await sound.getStatusAsync();
+      if (status.isPlaying) return;
+      await sound.setPositionAsync(0);
+      await sound.setVolumeAsync(this.volume);
+      await sound.playAsync();
+    }
+  }
+
+  static async pauseBackgroundGame() {
+    const sound = this.sounds.backgroundGame;
+    if (sound) {
+      const status = await sound.getStatusAsync();
+      if (status.isPlaying) await sound.pauseAsync();
+    }
+  }
+
   // --- Bruitages ---
-  static async playEffect(type: Exclude<SoundKey, 'background'>) {
+  static async playEffect(type: Exclude<SoundKey, 'background' | 'backgroundGame' >) {
     if (this.effectsMuted) return;
     const effect = new Audio.Sound();
     try {
