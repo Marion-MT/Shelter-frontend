@@ -18,7 +18,7 @@ type Achievement = {
 };
 
 type RecapGameRouteParams = {
-  achievements: Achievement[];
+  achievements: [Achievement];
 };
 
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
