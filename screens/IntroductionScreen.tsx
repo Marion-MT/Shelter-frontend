@@ -2,6 +2,8 @@ import { Dimensions, ImageBackground, Text, StyleSheet, View, Pressable } from '
 import { useEffect, useState, useRef } from 'react';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, FadeIn } from 'react-native-reanimated';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 
 const AnimatedImageBackground = Animated.createAnimatedComponent(ImageBackground);
 
@@ -24,20 +26,42 @@ export default function IntroductionScreen({ navigation } : IntoductionScreenPro
     const screenWidth = Dimensions.get('window').width;
     const screenHeight = Dimensions.get('window').height;
 
+    const timeoutsRef = useRef<number[]>([]);
+
     // skip
     const [showSkipMessage, setShowSkipMessage] = useState(false);
     const lastTap = useRef<number | null>(null);
+
+    // On stocke les timeout pour pouvoir les cleaner quand on skip l'intro
+    const setCinematicTimeout = (fn: Function, delay: number) => {
+      const id = setTimeout(fn, delay);
+      timeoutsRef.current.push(id);
+    };
+
+    // reset des anims et des timeouts
+    const reset = () => {
+      timeoutsRef.current.forEach(t => clearTimeout(t));
+      timeoutsRef.current = [];
+
+      // On reset les animations
+      /*imageScale.value = 1;
+      translateX.value = 0;
+      secondTranslateX.value = 0;
+      thirdImageScale.value = 1;
+      thirdTranslateX.value = 0;*/
+    }
 
     const handleTap = () => {
         const now = Date.now();
 
         if (lastTap.current && now - lastTap.current < 250) {
-            // Double tap detected → skip
+            // Double tap détecté, on skip (et on reset les timeout)
+            reset();
             navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
             return;
         }
 
-        // tap simple, on enregistre la moment pour le comparer au tap suivant
+        // tap simple, on enregistre le moment pour le comparer au tap suivant
         lastTap.current = now;
         setShowSkipMessage(true);
 
@@ -76,30 +100,41 @@ export default function IntroductionScreen({ navigation } : IntoductionScreenPro
     const thirdImageScale = useSharedValue(1.4);   // zoom de départ
     const thirdTranslateX = useSharedValue(300); // animation horizontale
 
+    useFocusEffect(
+      useCallback(() => {
+        
+        const startTimeline = () => {
+          const nextPhase = () => {
+            if(indexRef.current < cinematicTimeline.length){
 
-useEffect(() => {
+              const phaseData = cinematicTimeline[indexRef.current];  // on récupère les données de la phase courant (nom et durée)
+              setcinematicPhase(phaseData.phase);
 
-  const nextPhase = () => {
-    if(indexRef.current < cinematicTimeline.length){
+              indexRef.current++; // on incrémente la phase
 
-        const phaseData = cinematicTimeline[indexRef.current];  // on récupère les données de la phase courant (nom et durée)
-        setcinematicPhase(phaseData.phase);
-
-        indexRef.current++; // on incrémente la phase
-
-        if(indexRef.current < cinematicTimeline.length) {  // Si la dernière phase n'est pas encore atteinte, on lance la phase suivante
-        setTimeout(nextPhase, phaseData.duration); // on lance la phase en renseignant sa durée
-        } else {
-        setTimeout(() => {
-            navigation.navigate('Connexion', { screen: 'ConnexionScreen' }); // toutes les phases sont passées, on est envoyé vers l'écran connexion
-        }, phaseData.duration);
+              if(indexRef.current < cinematicTimeline.length) {  // Si la dernière phase n'est pas encore atteinte, on lance la phase suivante
+              setCinematicTimeout(nextPhase, phaseData.duration); // on lance la phase en renseignant sa durée
+              } else {
+              setCinematicTimeout(() => {
+                  navigation.navigate('Connexion', { screen: 'ConnexionScreen' }); // toutes les phases sont passées, on est envoyé vers l'écran connexion
+            }, phaseData.duration);
         }
     }
    
   };
+      nextPhase();
+    };
 
-  nextPhase();
-}, []);
+    startTimeline();
+
+    // Clean des timeout quand on quitte l'écran
+    return () => {
+      reset();
+    };
+
+  }, [])
+);
+
 
 useEffect(() => {
 

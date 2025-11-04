@@ -68,13 +68,11 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
     useFocusEffect(
         useCallback(() => {
-            
-            AudioManager.playBackground();
-
-            return () => {
+            if (user.soundOn) {
+                AudioManager.playBackground();
+            } else {
                 AudioManager.pauseBackground();
             }
-
         }, [])
     );
 

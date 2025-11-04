@@ -11,9 +11,11 @@ const soundFiles: Record<SoundKey, any> = {
 
 class AudioManager {
   private static sounds: Partial<Record<SoundKey, Audio.Sound>> = {};
-  private static isMuted = false;
+  private static musicMuted = false;
+  private static effectsMuted = false;
+  private static volume = 0.2;
 
-// Charge tous les son
+  // Chargement initial
   static async preloadAll() {
     for (const key of Object.keys(soundFiles) as SoundKey[]) {
       if (!this.sounds[key]) {
@@ -21,29 +23,26 @@ class AudioManager {
         await sound.loadAsync(soundFiles[key]);
         if (key === 'background') {
           await sound.setIsLoopingAsync(true);
-          await sound.setVolumeAsync(0.4);
+          await sound.setVolumeAsync(this.volume);
         }
         this.sounds[key] = sound;
       }
     }
   }
 
-// Lance la musique de fond
+  // --- Musique de fond ---
   static async playBackground() {
-    if (this.isMuted) return;
+    if (this.musicMuted) return;
     const sound = this.sounds.background;
     if (sound) {
       const status = await sound.getStatusAsync();
-      if (status.isPlaying) {
-        await sound.stopAsync();
-      }
-      
+      if (status.isPlaying) return;
       await sound.setPositionAsync(0);
+      await sound.setVolumeAsync(this.volume);
       await sound.playAsync();
     }
   }
 
- // mets la musique en pause
   static async pauseBackground() {
     const sound = this.sounds.background;
     if (sound) {
@@ -52,14 +51,13 @@ class AudioManager {
     }
   }
 
-// Joue un des bruitages
+  // --- Bruitages ---
   static async playEffect(type: Exclude<SoundKey, 'background'>) {
-    if (this.isMuted) return;
+    if (this.effectsMuted) return;
     const effect = new Audio.Sound();
     try {
       await effect.loadAsync(soundFiles[type]);
       await effect.playAsync();
-      // déchargement automatique après la lecture
       effect.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
           effect.unloadAsync();
@@ -70,14 +68,26 @@ class AudioManager {
     }
   }
 
-// Mute démute a impémenter 
-  static setMuted(mute: boolean) {
-    this.isMuted = mute;
-    if (mute) this.pauseBackground();
+  // --- Réglages dynamiques ---
+  static async setMusicMuted(muted: boolean) {
+    this.musicMuted = muted;
+    if (muted) this.pauseBackground();
     else this.playBackground();
   }
 
-// Décharge tous les sons a la fermeture de l'application
+  static setEffectsMuted(muted: boolean) {
+    this.effectsMuted = muted;
+  }
+
+  static async setMusicVolume(value: number) {
+    this.volume = value / 100;
+    const sound = this.sounds.background;
+    if (sound) {
+      await sound.setVolumeAsync(this.volume);
+    }
+  }
+
+  // --- Déchargement ---
   static async unloadAll() {
     for (const key in this.sounds) {
       await this.sounds[key as SoundKey]?.unloadAsync();
