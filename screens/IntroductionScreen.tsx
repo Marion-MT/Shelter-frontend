@@ -2,12 +2,9 @@ import { Dimensions, ImageBackground, Text, StyleSheet, View, Pressable } from '
 import { useEffect, useState, useRef } from 'react';
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, FadeIn } from 'react-native-reanimated';
-<<<<<<< HEAD
-import { useSelector } from 'react-redux';
-=======
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
->>>>>>> 9796f720b164e7e93133b976905a7b2fef20fb82
+import { useSelector } from 'react-redux';
 
 const AnimatedImageBackground = Animated.createAnimatedComponent(ImageBackground);
 
@@ -61,19 +58,14 @@ export default function IntroductionScreen({ navigation } : IntoductionScreenPro
         const now = Date.now();
 
         if (lastTap.current && now - lastTap.current < 250) {
-<<<<<<< HEAD
             // Double tap detected → skip 
+            reset();
             // redirige selon la présence du token
                    if (token) {
             navigation.navigate('Home', { screen: 'Home' });
               } else {
                   navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
               }
-=======
-            // Double tap détecté, on skip (et on reset les timeout)
-            reset();
-            navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
->>>>>>> 9796f720b164e7e93133b976905a7b2fef20fb82
             return;
         }
 
@@ -128,32 +120,16 @@ export default function IntroductionScreen({ navigation } : IntoductionScreenPro
 
               indexRef.current++; // on incrémente la phase
 
-<<<<<<< HEAD
-        const phaseData = cinematicTimeline[indexRef.current];  // on récupère les données de la phase courant (nom et durée)
-        setcinematicPhase(phaseData.phase);
-
-        indexRef.current++; // on incrémente la phase
-
-        if(indexRef.current < cinematicTimeline.length) {  // Si la dernière phase n'est pas encore atteinte, on lance la phase suivante
-        setTimeout(nextPhase, phaseData.duration); // on lance la phase en renseignant sa durée
-        } else {
-        setTimeout(() => {
-
-          // verifie le token a la fin de l'intro
-                      if (token) {
-              navigation.navigate('Home', { screen: 'Home' });
-            } else {
-            navigation.navigate('Connexion', { screen: 'ConnexionScreen' }); // toutes les phases sont passées, on est envoyé vers l'écran connexion ou home si token existant
-            }
-        }, phaseData.duration);
-=======
               if(indexRef.current < cinematicTimeline.length) {  // Si la dernière phase n'est pas encore atteinte, on lance la phase suivante
               setCinematicTimeout(nextPhase, phaseData.duration); // on lance la phase en renseignant sa durée
               } else {
               setCinematicTimeout(() => {
-                  navigation.navigate('Connexion', { screen: 'ConnexionScreen' }); // toutes les phases sont passées, on est envoyé vers l'écran connexion
+                                      if (token) {
+              navigation.navigate('Home', { screen: 'Home' });
+            } else {
+            navigation.navigate('Connexion', { screen: 'ConnexionScreen' }); // toutes les phases sont passées, on est envoyé vers l'écran connexion ou home si token existant
+            }
             }, phaseData.duration);
->>>>>>> 9796f720b164e7e93133b976905a7b2fef20fb82
         }
     }
    

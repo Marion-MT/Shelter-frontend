@@ -1,12 +1,8 @@
 import { View, Text, StyleSheet, ImageBackground, Image, Pressable, TouchableOpacity, Modal, Alert } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { Slider, Switch } from '@rneui/themed';
-<<<<<<< HEAD
-import { fetchWithAuth } from "../components/fetchWithAuth";
-import { useState } from "react";
-=======
 import { useState, useEffect } from "react";
->>>>>>> 9796f720b164e7e93133b976905a7b2fef20fb82
+import { fetchWithAuth } from "../components/fetchWithAuth";
 import { useSelector, useDispatch } from "react-redux";
 import { updateBestScore } from "../reducers/user";
 import { FontAwesome } from "@expo/vector-icons";
@@ -69,11 +65,10 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
 
     const handleSaveSettings = async () => {
     try {
-        const response = await fetch(`${BACKEND_ADDRESS}/users/settings`, {
+        const response = await fetchWithAuth(`/users/settings`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${user.token}`,
         },
         body: JSON.stringify({
             volume,

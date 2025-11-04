@@ -48,7 +48,10 @@ const store = configureStore({
 
 const persistor = persistStore(store);
 
+export { store }
+
 import { useFonts } from 'expo-font';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -56,7 +59,6 @@ const Stack = createNativeStackNavigator();
 export default function App() {
 
 
-  // Charge les sons + synchronise avec Redux
   useEffect(() => {
     (async () => {
       await AudioManager.preloadAll();

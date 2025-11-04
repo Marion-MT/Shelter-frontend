@@ -121,5 +121,5 @@ export const userSlice = createSlice({
     }
 });
 
-export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays, setUserData, signout, updateBestScore, updateSettings } = userSlice.actions;
+export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays, setUserData, signout, updateBestScore, updateSettings, updateAccestoken } = userSlice.actions;
 export default userSlice.reducer;
