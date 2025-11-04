@@ -68,10 +68,10 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
     useFocusEffect(
         useCallback(() => {
-            if (user.soundOn) {
-                AudioManager.playBackground();
-            } else {
-                AudioManager.pauseBackground();
+            AudioManager.pauseBackground();
+            AudioManager.playBackgroundGame();
+            return () =>{
+                AudioManager.pauseBackgroundGame();
             }
         }, [])
     );
@@ -106,6 +106,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     // Déclenche le gameover
     const triggerGameover = (type: string, hook: string, phrase: string, description: string, achievements: [Object] ) => {
         setTimeout(() => {
+            AudioManager.pauseBackgroundGame();
             navigation.navigate('EndGame', { screen: 'EndGame', type: type, hook: hook, phrase: phrase, description: description, achievements: achievements  });
         }, 1000);
     }

@@ -90,7 +90,6 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
         AudioManager.setEffectsMuted(!data.settings.btnSoundOn);
         AudioManager.setMusicVolume(data.settings.volume);
 
-        console.log('Paramètres sauvegardés avec succès sur le serveur :', data.settings);
         Alert.alert('Paramètres sauvegardés')
             } else {
             console.log('Erreur côté serveur :', data.error);
@@ -115,7 +114,6 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
         .then(data => {
             if (data.result === true) {
                 dispatch(updateBestScore(data.bestScore));
-                console.log('Compte réinitialisé avec succès');
                 Alert.alert('Compte réinitialisé avec succès')
                 return;
             } else {
@@ -177,9 +175,9 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
                             </View>
                         </View>
                         <TouchableOpacity onPress={() => {AudioManager.playEffect('click'); handleSaveSettings()}}>
-                            <View style={styles.btnContainer}>
+                            <View style={styles.btnContainerSave}>
                                 <Text style={styles.btnText}>Sauvegarder</Text>
-                                <Text style={styles.btnText}>les parametres</Text>
+                                <Text style={styles.btnText}>les paramètres</Text>
                             </View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={() => {AudioManager.playEffect('click'); setModalVisible(true);}}>
@@ -289,7 +287,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'stretch',
         width: '80%',
-        paddingTop :30
+        paddingTop :20
     },
     volumeSlider: {
         width: '100%',
@@ -306,11 +304,23 @@ const styles = StyleSheet.create({
         height: 80,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#242120',
+        backgroundColor: '#D05A34',
         borderColor: 'black',
         borderWidth: 1.5,
         borderRadius: 12,
-        marginBottom: 25,
+        marginBottom: 15,
+    },
+    btnContainerSave: {
+        width: 210,
+        height: 80,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#74954E',
+        borderColor: 'black',
+        borderWidth: 1.5,
+        borderRadius: 12,
+        marginBottom: 5,
+        marginTop: 15,
     },
     btnText: {
         color: '#FFE8BF',
