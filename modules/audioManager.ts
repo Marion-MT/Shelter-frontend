@@ -16,13 +16,13 @@ class AudioManager {
   private static effectsMuted = false;
   private static volume = 0.2;
 
-  // Chargement initial
+  // --- Préchargement ---
   static async preloadAll() {
     for (const key of Object.keys(soundFiles) as SoundKey[]) {
       if (!this.sounds[key]) {
         const sound = new Audio.Sound();
         await sound.loadAsync(soundFiles[key]);
-        if (key === 'background') {
+        if (key === 'background' || key === 'backgroundGame') {
           await sound.setIsLoopingAsync(true);
           await sound.setVolumeAsync(this.volume);
         }
@@ -31,17 +31,21 @@ class AudioManager {
     }
   }
 
-  // --- Musique de fond ---
+  // --- Musique de fond (menu) ---
   static async playBackground() {
     if (this.musicMuted) return;
+
+    // Coupe la musique de jeu si elle tourne
+    await this.pauseBackgroundGame();
+
     const sound = this.sounds.background;
-    if (sound) {
-      const status = await sound.getStatusAsync();
-      if (status.isPlaying) return;
-      await sound.setPositionAsync(0);
-      await sound.setVolumeAsync(this.volume);
-      await sound.playAsync();
-    }
+    if (!sound) return;
+    const status = await sound.getStatusAsync();
+    if (status.isPlaying) return;
+
+    await sound.setPositionAsync(0);
+    await sound.setVolumeAsync(this.volume);
+    await sound.playAsync();
   }
 
   static async pauseBackground() {
@@ -52,17 +56,21 @@ class AudioManager {
     }
   }
 
-   // --- Musique de fond pour les parties ---
+  // --- Musique de jeu ---
   static async playBackgroundGame() {
     if (this.musicMuted) return;
+
+    // Coupe la musique du menu si elle tourne
+    await this.pauseBackground();
+
     const sound = this.sounds.backgroundGame;
-    if (sound) {
-      const status = await sound.getStatusAsync();
-      if (status.isPlaying) return;
-      await sound.setPositionAsync(0);
-      await sound.setVolumeAsync(this.volume);
-      await sound.playAsync();
-    }
+    if (!sound) return;
+    const status = await sound.getStatusAsync();
+    if (status.isPlaying) return;
+
+    await sound.setPositionAsync(0);
+    await sound.setVolumeAsync(this.volume);
+    await sound.playAsync();
   }
 
   static async pauseBackgroundGame() {
@@ -74,11 +82,12 @@ class AudioManager {
   }
 
   // --- Bruitages ---
-  static async playEffect(type: Exclude<SoundKey, 'background' | 'backgroundGame' >) {
+  static async playEffect(type: Exclude<SoundKey, 'background' | 'backgroundGame'>) {
     if (this.effectsMuted) return;
     const effect = new Audio.Sound();
     try {
       await effect.loadAsync(soundFiles[type]);
+      await effect.setVolumeAsync(this.volume);
       await effect.playAsync();
       effect.setOnPlaybackStatusUpdate((status) => {
         if (status.isLoaded && status.didJustFinish) {
@@ -93,8 +102,12 @@ class AudioManager {
   // --- Réglages dynamiques ---
   static async setMusicMuted(muted: boolean) {
     this.musicMuted = muted;
-    if (muted) this.pauseBackground();
-    else this.playBackground();
+    if (muted) {
+      await this.pauseBackground();
+      await this.pauseBackgroundGame();
+    } else {
+      await this.playBackground(); // relance la musique du menu
+    }
   }
 
   static setEffectsMuted(muted: boolean) {
@@ -103,13 +116,15 @@ class AudioManager {
 
   static async setMusicVolume(value: number) {
     this.volume = value / 100;
-    const sound = this.sounds.background;
-    if (sound) {
-      await sound.setVolumeAsync(this.volume);
-    }
+
+    const bg = this.sounds.background;
+    const bgGame = this.sounds.backgroundGame;
+
+    if (bg) await bg.setVolumeAsync(this.volume);
+    if (bgGame) await bgGame.setVolumeAsync(this.volume);
   }
 
-  // --- Déchargement ---
+  // --- Nettoyage ---
   static async unloadAll() {
     for (const key in this.sounds) {
       await this.sounds[key as SoundKey]?.unloadAsync();
