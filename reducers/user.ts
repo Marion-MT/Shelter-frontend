@@ -55,13 +55,14 @@ export type UserState= {
         numberDays: number | null;
         bestScore: number | null;
         currentCard: Card | null;
+        btnSoundOn: boolean;
         soundOn: boolean;
         volume: number;
     }
 }
 
 const initialState: UserState = {
-    value : {email: null, username: null, token: null, stateOfGauges: null, numberDays: null, bestScore: null, currentCard: null, soundOn: true, volume: 50},
+    value : {email: null, username: null, token: null, stateOfGauges: null, numberDays: null, bestScore: null, currentCard: null, btnSoundOn: true, soundOn: true, volume: 50},
 };
 
 export const userSlice = createSlice({
@@ -98,9 +99,20 @@ export const userSlice = createSlice({
         signout:(state) => {
             state.value = initialState.value;
             console.log("dispatch signout=>",initialState)
-        }
+        },
+        updateSettings: (state, action: PayloadAction<{soundOn: boolean; btnSoundOn: boolean; volume: number}>) => {
+            if (action.payload.soundOn !== undefined) {
+                state.value.soundOn = action.payload.soundOn;
+            }
+            if (action.payload.btnSoundOn !== undefined) {
+                state.value.btnSoundOn = action.payload.btnSoundOn;
+            }
+            if (action.payload.volume !== undefined) {
+                state.value.volume = action.payload.volume;
+            }
+        },
     }
 });
 
-export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays, setUserData, signout, updateBestScore } = userSlice.actions;
+export const { signin, setGameState, setGauges, setCurrentCard, setCurrentNumberDays, setUserData, signout, updateBestScore, updateSettings } = userSlice.actions;
 export default userSlice.reducer;

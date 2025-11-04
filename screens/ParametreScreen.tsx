@@ -1,12 +1,13 @@
 import { View, Text, StyleSheet, ImageBackground, Image, Pressable, TouchableOpacity, Modal } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { Slider, Switch } from '@rneui/themed';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateBestScore } from "../reducers/user";
 import { FontAwesome } from "@expo/vector-icons";
 
 import AudioManager from '../modules/audioManager';
+import { updateSettings } from "../reducers/user";
 
 type ParametreScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -15,24 +16,68 @@ type ParametreScreenProps = {
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
 export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
-    const [volume, setVolume] = useState(50);
-    const [soundEnabled, setSoundEnabled] = useState(true);
+    const user = useSelector((state: string) => state.user.value);
+
+    const [volume, setVolume] = useState(user.volume);
+    const [soundEnabled, setSoundEnabled] = useState(user.soundOn);
     const [soundText, setSoundText] = useState('');
-    const [soundClicEnabled, setSoundClicEnabled] = useState(true);
+    const [soundClicEnabled, setSoundClicEnabled] = useState(user.btnSoundOn);
     const [soundClicText, setSoundClicText] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
 
-    const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
 
+    // vérifie l'envoie des donnée dans la console
+    useEffect(() => {
+     console.log("user store update =>", 'Volume:',user.volume, 'Musique:',user.soundOn, 'Bruitage:',user.btnSoundOn);
+    }, [user]);
+
+    useEffect(() => {
+        setVolume(user.volume);
+        setSoundEnabled(user.soundOn);
+        setSoundClicEnabled(user.btnSoundOn);
+        setSoundText(user.soundOn ? 'ON' : 'OFF');
+        setSoundClicText(user.btnSoundOn ? 'ON' : 'OFF');
+    }, [user]);
+
+
+    const handleVolumeChange = (value: number) => {
+        setVolume(value);
+        AudioManager.setMusicVolume(value); // modifie le volume de la musique
+        dispatch(updateSettings({ volume: value }));
+    };
+
     const toggleSound = () => {
-        setSoundEnabled(!soundEnabled);
-        setSoundText(soundEnabled ? 'OFF' : 'ON');
+        const newState = !soundEnabled;
+        setSoundEnabled(newState);
+        setSoundText(newState ? 'ON' : 'OFF');
+        AudioManager.setMusicMuted(!newState); // mute/démute la musique
+        dispatch(updateSettings({ soundOn: newState }));
     };
 
     const toggleSoundClic = () => {
-        setSoundClicEnabled(!soundClicEnabled);
-        setSoundClicText(soundClicEnabled ? 'OFF' : 'ON');
+        const newState = !soundClicEnabled;
+        setSoundClicEnabled(newState);
+        setSoundClicText(newState ? 'ON' : 'OFF');
+        AudioManager.setEffectsMuted(!newState); // mute/démute les bruitages
+        dispatch(updateSettings({ btnSoundOn: newState }));
+    };
+
+    const handleSaveSettings = () => {
+        dispatch(updateSettings({
+            soundOn: soundEnabled,
+            btnSoundOn: soundClicEnabled,
+            volume,
+        }));
+        AudioManager.setMusicMuted(!soundEnabled);
+        AudioManager.setEffectsMuted(!soundClicEnabled);
+        AudioManager.setMusicVolume(volume);
+
+        console.log('Paramètres sauvegardés :', {
+            soundOn: soundEnabled,
+            btnSoundOn: soundClicEnabled,
+            volume,
+        });
     };
    
     const handleNavigate = () => {
@@ -77,7 +122,7 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
                             <Text style={styles.text}>Volume : {volume}</Text>
                             <Slider
                                 value={volume}
-                                onValueChange={setVolume}
+                                onValueChange={handleVolumeChange}
                                 maximumValue={100}
                                 minimumValue={0}
                                 step={2}
@@ -109,6 +154,12 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
                                 />
                             </View>
                         </View>
+                        <TouchableOpacity onPress={() => {AudioManager.playEffect('click'); handleSaveSettings()}}>
+                            <View style={styles.btnContainer}>
+                                <Text style={styles.btnText}>Sauvegarder</Text>
+                                <Text style={styles.btnText}>les parametres</Text>
+                            </View>
+                        </TouchableOpacity>
                         <TouchableOpacity onPress={() => {AudioManager.playEffect('click'); setModalVisible(true);}}>
                             <View style={styles.btnContainer}>
                                 <Text style={styles.btnText}>réinitialisation</Text>
