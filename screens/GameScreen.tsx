@@ -42,7 +42,7 @@ type GameResponse = {
     };
     description: string;
   };
-  achievements: [Object];
+  achievements: [];
 };
 
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
@@ -66,6 +66,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     const [lastResponse, setLastResponse] = useState<GameResponse|null>(null); //used to store data when there is a consequence to display before displaying the next card (or gameover)
         
     const foodBlink = useSharedValue(1);
+    const shakeOffset = useSharedValue(0); // pour seccouer la carte quand gameover
 
     useFocusEffect(
         useCallback(() => {
@@ -105,6 +106,25 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
         setCurrentSide(side)
     }
 
+      // ANIMATION GAMEOVER
+    const shakeStyle = useAnimatedStyle(() => ({
+        transform: [{ translateX: shakeOffset.value }],
+    }));
+
+    const triggerShake = () => {
+        shakeOffset.value = withRepeat(
+            withTiming(10, { duration: 50 }), // décalage vers la droite
+            6, // nombre de répétitions
+            true // reverse automatique
+        );
+
+        // Reset une fois l'animation finie
+        setTimeout(() => {
+            shakeOffset.value = withTiming(0, { duration: 50 });
+        }, 350);
+    };
+
+
     // Déclenche le gameover
     const triggerGameover = (type: string, hook: string, phrase: string, description: string, achievements: [] ) => {
         setTimeout(() => {
@@ -113,7 +133,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     }
 
     // Déclenche le gameover
-    const handleGameover = (achievements: [Object] ) => {
+    const handleGameover = (achievements: [] ) => {
 
         setTimeout(() => {
             resetGame();
@@ -141,7 +161,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                 if(!data.result){ // Si pas de result, on déclenche le gameover pour ne pas bloquer le joueur dans la partie
                     //triggerGameover("","","","",[]);
                     console.log("gameover because there is not other cards");
-                    handleGameover([[]]);
+                    handleGameover([]);
                     return;
                 }
 
@@ -155,11 +175,20 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                 if(data.gameover || !data.card){
                     //console.log(data.death.type + ' ' + data.death.title.hook + ' ' + data.death.title.phrase + ' ' + data.death.description);
                     //triggerGameover(data.death.type, data.death.title.hook, data.death.title.phrase, data.death.description, data.achievements);
-                    setGameover(true);
+                   /* setGameover(true);
                     setConsequenceText(data.death.description);
                     setShowConsequence(true);
                     setTriggerReset(!triggerReset);
-                    console.log("gameover 1");
+                    console.log("gameover 1");*/
+
+                    triggerShake(); // tremblement de la carte
+
+                    setTimeout(() => {
+                        setGameover(true);
+                        setConsequenceText(data.death.description);
+                        setShowConsequence(true);
+                        setTriggerReset(!triggerReset);
+                    }, 400);
                     return;
                 }
 
@@ -196,12 +225,22 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
                 if(lastResponse && (lastResponse.gameover || !lastResponse.card)){ // gestion du gameover
                     if(lastResponse.death){
-                        setGameover(true);
+                        /*setGameover(true);
                         setConsequenceText(lastResponse.death.description);
                         setShowConsequence(true);
                         setTriggerReset(!triggerReset);
-                        console.log("gameover 2");
-                    }
+                        console.log("gameover 2");*/
+
+                        triggerShake(); // tremblement de la carte
+
+                        setTimeout(() => {
+                            setGameover(true);
+                            setConsequenceText(lastResponse?.death?.description || "");
+                            setShowConsequence(true);
+                            setTriggerReset(!triggerReset);
+                        }, 400);
+                        }
+                    
                         //triggerGameover(lastResponse.death.type, lastResponse.death.title.hook, lastResponse.death.title.phrase, lastResponse.death.description, lastResponse.achievements);
                     return;
                 }
@@ -239,7 +278,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
             handleChoice();
         }
         else{
-            handleGameover(lastResponse?.achievements || [[]]);
+            handleGameover(lastResponse?.achievements || []);
         }
 
     };
@@ -247,13 +286,12 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
     // On valide le swipe à droite
     const onSwipeRight = () => {
         setCurrentSide('right');
-        handleChoice();
 
         if(!gameover){
             handleChoice();
         }
         else{
-            handleGameover(lastResponse?.achievements || [[]]);
+            handleGameover(lastResponse?.achievements || []);
         }
     };
 
@@ -333,6 +371,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
         }
     };
 
+
     return (
         <ImageBackground source={require('../assets/background.jpg')} resizeMode="cover" style={styles.backgroundImage}>
             <View style={styles.container}>
@@ -343,7 +382,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                     <Text style={styles.numberDays}>JOUR {user.numberDays}</Text>
                 </View>
                 <View style={styles.main}>
-                    <View style={styles.darkBackground}>
+                    <Animated.View style={[styles.darkBackground, shakeStyle]}>
                         <View style={styles.cardContainer}>
                             <View style={styles.gaugesContainer}>
                                 <Gauge icon={require('../assets/icon-hunger.png')} color='#f28f27' percent={hunger} indicator={hungerIndicator} decrease={food === 0}/>
@@ -367,27 +406,19 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
                                 {/*GAMEOVER*/}
                                 {gameover && 
-                                <>
-                                    <Animated.Image 
-                                        entering={FadeIn.duration(200)}
-                                        exiting={FadeOut.duration(200)}
-                                        source={require('../assets/icon-skull.png')} resizeMode="contain" style={styles.skullLogo} 
-                                    />
-                                    <Animated.Text  // smooth fade on the text
-                                        entering={FadeIn.duration(200)}
-                                        exiting={FadeOut.duration(200)}
-                                        style={styles.textDeath}
-                                        >
+                                <Animated.View 
+                                style={styles.gameoverSection}
+                                entering={FadeIn.duration(800).delay(1000)}
+                                exiting={FadeOut.duration(200)}
+                                >
+                                    <Image source={require('../assets/icon-skull.png')} resizeMode="contain" style={styles.skullLogo} />
+                                    <Text style={styles.textDeath}>
                                         {lastResponse?.death?.title.phrase}
-                                    </Animated.Text>
-                                    <Animated.Text  // smooth fade on the text
-                                        entering={FadeIn.duration(200)}
-                                        exiting={FadeOut.duration(200)}
-                                        style={[styles.deathCause, {color: lastResponse?.death ? changeColor(lastResponse?.death?.type) : '#ffe7bf'}]}
-                                        >
+                                    </Text>
+                                    <Text style={[styles.deathCause, {color: lastResponse?.death ? changeColor(lastResponse?.death?.type) : '#ffe7bf'}]}>
                                         {lastResponse?.death?.title.hook.toUpperCase()}
-                                    </Animated.Text>
-                                </>
+                                    </Text>
+                                </Animated.View>
                                     
                                 }
                                 
@@ -415,7 +446,7 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
                                 </View>
                             </View>
                         </View>
-                    </View>               
+                    </Animated.View>               
                 </View>
                 <View style={styles.bottomSection}>
                     <View style={styles.foodSection}>
@@ -513,10 +544,16 @@ const styles = StyleSheet.create({
         fontSize: 18,
         textAlign: 'center'
     },
+    gameoverSection:{
+        gap: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding : 20
+    },
     textDeath: {
         color: '#ffe7bf',
         fontFamily: 'ArialRounded',
-        fontSize: 22,
+        fontSize: 18,
         textAlign: 'center'
     },
     deathCause: {
