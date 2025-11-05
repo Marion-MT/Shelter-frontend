@@ -28,11 +28,6 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
 
     const dispatch = useDispatch();
 
-    // vérifie l'envoie des donnée dans la console
-    useEffect(() => {
-     console.log("user store update =>", 'Volume:',user.volume, 'Musique:',user.soundOn, 'Bruitage:',user.btnSoundOn);
-    }, [user]);
-
     useEffect(() => {
         setVolume(user.volume);
         setSoundEnabled(user.soundOn);
@@ -81,17 +76,15 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
         const data = await response.json();
 
         if (data.result) {
-        dispatch(updateSettings({
-            volume: data.settings.volume,
-            soundOn: data.settings.soundOn,
-            btnSoundOn: data.settings.btnSoundOn,
-        }));
-        AudioManager.setMusicMuted(!data.settings.soundOn);
-        AudioManager.setEffectsMuted(!data.settings.btnSoundOn);
-        AudioManager.setMusicVolume(data.settings.volume);
-        navigation.navigate('Home', { screen: 'Home' });
-            } else {
-            console.log('Erreur côté serveur :', data.error);
+                dispatch(updateSettings({
+                    volume: data.settings.volume,
+                    soundOn: data.settings.soundOn,
+                    btnSoundOn: data.settings.btnSoundOn,
+                }));
+                AudioManager.setMusicMuted(!data.settings.soundOn);
+                AudioManager.setEffectsMuted(!data.settings.btnSoundOn);
+                AudioManager.setMusicVolume(data.settings.volume);
+                navigation.navigate('Home', { screen: 'Home' });
             }
         } catch (error) {
             console.error('Erreur de requête PUT /settings :', error);
@@ -108,8 +101,6 @@ export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
                 dispatch(updateBestScore(data.bestScore));
                 setResetConfirmationModal(true);
                 return;
-            } else {
-                console.log('Échec de la réinitialisation du compte');
             }
         })
         .catch(error => {

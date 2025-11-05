@@ -54,11 +54,9 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                 headers: {'Content-Type' : 'application/json'},
                 body: JSON.stringify({username : username.trim(), password})
             })
-            .then(response => {console.log("response received"); return response.json()})
+            .then(response => {return response.json()})
             .then(data => {
-                console.log("data received");
                 if (data.result){
-                    console.log("data signin =>",data)
                     //stokage du token et redirection
                     dispatch(signin({token : data.token, refreshToken: data.refreshToken, username, email: data.email}))
                     setUsername('')
@@ -103,7 +101,6 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
                     body: JSON.stringify({email: emailSignup, username: usernameSignup, password: passwordSignup})
                 }).then(response => response.json())
                 .then(data => {
-                    console.log("création de compte", data.result);
                     if (data.result === true){
                         dispatch(signin({token : data.token, refreshToken: data.refreshToken, username : usernameSignup, email: emailSignup}))
                         setEmailSignup('')

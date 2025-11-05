@@ -41,20 +41,17 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
         fetch(`${BACKEND_ADDRESS}/achievements`)
         .then(response => response.json())
         .then(data => {
-            //console.log(data)
             setSuccesData(data.achievements)
         })
         .catch(err => console.error('Erreur fetch succes', err))
 
         //fetch top players
         fetchWithAuth(`/users/topScores`, {
-            method: 'GET',
+          method: 'GET',
         })
         .then(response => response.json())
         .then(data=>{
-            //console.log('topscore====>',data)
-            setTopPlayers(data.topScores)
-            //console.log('TopPlayer', topPlayers)
+          setTopPlayers(data.topScores)
         })
         .catch(err=>console.error('Erreur fetch Top Players', err))
 
@@ -64,9 +61,7 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
         })
         .then(response => response.json())
         .then(data=>{
-            console.log('Data unlockedAchievement====>',data)
             setUnlockedAchievement(data.unlockedAchievements)
-            console.log('unlockedAch.', unlockedAchievement)
         })
         .catch(err=>console.error('Erreur fetch Top Players', err))
     },[])

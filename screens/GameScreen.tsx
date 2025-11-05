@@ -192,12 +192,9 @@ export default function GameScreen({ navigation }: GameScreenProps ) {
 
                 const data = await response.json();
                 if(!data.result){ // Si pas de result, on déclenche le gameover pour ne pas bloquer le joueur dans la partie
-                    //console.log("gameover because there is not other cards");
                     handleGameover([]);
                     return;
                 }
-
-                //console.log(data);
 
                 setLastResponse(data); // On stock la précédente réponse (qui contient la carte ou les infos du gameover, au cas où il y a une conséquence à afficher)
 

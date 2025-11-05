@@ -31,8 +31,6 @@ export default function RecapGameScreen({ navigation, route }: RecapGameScreenPr
 
     const { achievements } = route.params;
 
-    //console.log("achievements = ", achievements);
-
     // Update best score in reduce
     useFocusEffect(
         useCallback(() => {
@@ -118,11 +116,8 @@ export default function RecapGameScreen({ navigation, route }: RecapGameScreenPr
                 headers: { 'Content-Type': 'application/json' },
             })
             .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                
+            .then(data => {            
                 if (data.error) {
-                    console.log('Error:', data.error);
                     return;
                 } else {
                     AudioManager.playEffect('click');

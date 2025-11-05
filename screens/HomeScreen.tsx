@@ -31,14 +31,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
             .then(data => {
                 dispatch(setUserData({ bestScore: data.bestScore, soundOn: data.settings.soundOn, volume: data.settings.volume, btnSoundOn: data.settings.btnSoundOn }));
                 if (!data.currentGame) {
-                    //console.log('Pas de game en cours');
                     setCurrentGame(false);
                     return;
                 } else {                
                     if (data.currentGame) {
-                        setCurrentGame(true);
-                        //console.log('Game en cours');
-                        
+                        setCurrentGame(true);        
                     }
                 }
             });
@@ -58,14 +55,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
             })
             .then(response => response.json())
             .then(data => {
-                console.log("GET games : ", data);
                 if (data.result && data.games && data.games.length > 0) {
                     dispatch(setFirstGame(false)); // il y a des partie dans l'historique du joueur, on affihe pas le tuto
-                    console.log("on affiche pas le tuto");
                     return;
                 } else {              
                     dispatch(setFirstGame(true));   // pas de partie dans l'historique du joueur, on affihe le tuto
-                    console.log("on affiche le tuto");
                 }
             });
         }, [])
@@ -78,7 +72,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
         .then(response => response.json())
         .then(data => {
             if (data.error) {            
-                console.log('Error:', data.error);
                 return;
             } else {
                 AudioManager.playEffect('click');
@@ -93,12 +86,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
             method: 'POST',
         })
         .then(response => {
-            console.log('Response status:', response.status)
             return response.json()})
         .then(data => {
-            console.log(data);      
             if (data.error) {
-                console.log('Error:', data.error);
                 return;
             } else {
                 AudioManager.playEffect('click');
@@ -124,7 +114,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps ) {
     };
 
     const handleLogout = () => {
-        //console.log("pré-signout", user)
         AudioManager.playEffect('click');
         dispatch(signout())
         navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
