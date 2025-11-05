@@ -2,7 +2,7 @@ import 'react-native-reanimated';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { useFonts } from 'expo-font';
@@ -20,10 +20,26 @@ import ParametreScreen from './screens/ParametreScreen';
 import SplashScreen from './screens/SplashScreen';
 import SuccesScreen from './screens/SuccesScreen';
 import RecapGameScreen from './screens/RecapGameScreen';
+import { navigationEmitter } from './components/fetchWithAuth';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+
+  const navigationRef = useRef<any>(null);
+
+    useEffect(() => {
+    // on ecoute l'événement
+   const listener = () => {
+    navigationRef.current?.navigate('Connexion');
+  };
+
+  navigationEmitter.on('REDIRECT_TO_LOGIN', listener);
+
+  return () => {
+    navigationEmitter.removeListener('REDIRECT_TO_LOGIN', listener);
+  };
+}, []);
 
   // Charge les sons et lance la musique de fond du menu
   useEffect(() => {
@@ -74,7 +90,7 @@ export default function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <GestureHandlerRootView>
-          <NavigationContainer>
+          <NavigationContainer ref={navigationRef}>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
               <Stack.Screen name="SplashScreen" component={SplashScreen} />
               <Stack.Screen name="Introduction" component={IntroductionScreen} />
