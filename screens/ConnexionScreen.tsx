@@ -52,7 +52,7 @@ export default function ConnexionScreen({ navigation }: ConnexionScreenProps ) {
             fetch(`${BACKEND_ADDRESS}/users/signin`, {
                 method: 'POST',
                 headers: {'Content-Type' : 'application/json'},
-                body: JSON.stringify({username, password})
+                body: JSON.stringify({username : username.trim(), password})
             })
             .then(response => {console.log("response received"); return response.json()})
             .then(data => {
