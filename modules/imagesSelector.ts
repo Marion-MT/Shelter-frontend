@@ -16,7 +16,7 @@ export function getImage(type : String){
         case 'cans' :
             return require('../assets/pictures/icon-cans.png');
         case 'car' :
-            return require('../assets/pictures/icon-cans.png');
+            return require('../assets/pictures/icon-car.png');
         case 'city' :
             return require('../assets/pictures/icon-city.png');
         case 'depress' :
