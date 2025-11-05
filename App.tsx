@@ -19,27 +19,12 @@ import IntroductionScreen from './screens/IntroductionScreen';
 import ParametreScreen from './screens/ParametreScreen';
 import SplashScreen from './screens/SplashScreen';
 import SuccesScreen from './screens/SuccesScreen';
-import RecapGameScreen from './screens/RecapGameScreen';
-import { navigationEmitter } from './components/fetchWithAuth';
+import RecapGameScreen from './screens/RecapGameScreen';;
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
 
-  const navigationRef = useRef<any>(null);
-
-    useEffect(() => {
-    // on ecoute l'événement
-   const listener = () => {
-    navigationRef.current?.navigate('Connexion');
-  };
-
-  navigationEmitter.on('REDIRECT_TO_LOGIN', listener);
-
-  return () => {
-    navigationEmitter.removeListener('REDIRECT_TO_LOGIN', listener);
-  };
-}, []);
 
   // Charge les sons et lance la musique de fond du menu
   useEffect(() => {
@@ -90,7 +75,7 @@ export default function App() {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <GestureHandlerRootView>
-          <NavigationContainer ref={navigationRef}>
+          <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
               <Stack.Screen name="SplashScreen" component={SplashScreen} />
               <Stack.Screen name="Introduction" component={IntroductionScreen} />

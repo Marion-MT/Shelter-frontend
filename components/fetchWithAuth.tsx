@@ -1,21 +1,21 @@
 import { store } from '../store';
 import { updateTokens, signout } from '../reducers/user';
-import { EventEmitter } from 'eventemitter3';
-
+import { useNavigation } from '@react-navigation/native';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
-const navigationEmitter = new EventEmitter(); 
 
-export const fetchWithAuth = async (endpoint: string, options: any = {}) => {
+export const useFetchWithAuth = () => {
+  const navigation = useNavigation();
+
+const fetchWithAuth = async (endpoint: string, options: any = {}) => {
   
   try{
     const state = store.getState();
-    console.log('Redux state:', state);
 
   const { token: accessToken, refreshToken } = state.user.value;
 
   if (!accessToken || !refreshToken) {
-      navigationEmitter.emit('REDIRECT_TO_LOGIN');
+      navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
       return new Response(JSON.stringify({ error: 'No tokens' }), { status: 401 });
     }
 
@@ -36,14 +36,13 @@ export const fetchWithAuth = async (endpoint: string, options: any = {}) => {
     if(!refreshResponse.ok){
         store.dispatch(signout());
 
-        navigationEmitter.emit('REDIRECT_TO_LOGIN')
+        navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
         return refreshResponse;
         }
     
     const newToken = await refreshResponse.json();
 
     if (newToken.tokens.token) {
-      console.log('New tokens received:', newToken.tokens);
       store.dispatch(updateTokens(newToken.tokens));;
       response = await fetch(`${API_URL}${endpoint}`, {
         ...options,
@@ -51,7 +50,7 @@ export const fetchWithAuth = async (endpoint: string, options: any = {}) => {
       });
     } else {
       store.dispatch(signout());
-      navigationEmitter.emit('REDIRECT_TO_LOGIN')
+      navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
     }
   }
   return response;
@@ -62,4 +61,5 @@ export const fetchWithAuth = async (endpoint: string, options: any = {}) => {
     }
 };
 
-export { navigationEmitter };
+return fetchWithAuth;
+}
