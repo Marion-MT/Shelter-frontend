@@ -19,8 +19,9 @@
       }
     },
     "android": {
+      "icon": "./assets/icon-game.png",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon-game.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
