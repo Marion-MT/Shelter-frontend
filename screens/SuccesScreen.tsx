@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet,Image, ImageBackground } from "react-native"
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { useSelector } from "react-redux";
-import { fetchWithAuth } from "../components/fetchWithAuth";
+import { useFetchWithAuth } from "../components/fetchWithAuth";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { ScrollView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
@@ -29,6 +29,7 @@ type TopPlayer = {
 const BACKEND_ADDRESS = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
 export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
+  const fetchWithAuth = useFetchWithAuth();
     const user = useSelector((state: string) => state.user.value);
     const [succesData, setSuccesData] = useState<achievements[]>([]);
     const [unlockedAchievement, setUnlockedAchievement] = useState<achievements[]>([]);

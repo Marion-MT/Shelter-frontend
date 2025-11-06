@@ -1,14 +1,23 @@
 import { store } from '../store';
 import { updateTokens, signout } from '../reducers/user';
-
+import { useNavigation } from '@react-navigation/native';
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_ADDRESS;
 
-export const fetchWithAuth = async (endpoint: string, options: any = {}) => {
+
+export const useFetchWithAuth = () => {
+  const navigation = useNavigation();
+
+const fetchWithAuth = async (endpoint: string, options: any = {}) => {
   
   try{
     const state = store.getState();
+
   const { token: accessToken, refreshToken } = state.user.value;
 
+  if (!accessToken || !refreshToken) {
+      navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
+      return new Response(JSON.stringify({ error: 'No tokens' }), { status: 401 });
+    }
 
   let response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
@@ -26,7 +35,9 @@ export const fetchWithAuth = async (endpoint: string, options: any = {}) => {
 
     if(!refreshResponse.ok){
         store.dispatch(signout());
-        return response;
+
+        navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
+        return refreshResponse;
         }
     
     const newToken = await refreshResponse.json();
@@ -39,6 +50,7 @@ export const fetchWithAuth = async (endpoint: string, options: any = {}) => {
       });
     } else {
       store.dispatch(signout());
+      navigation.navigate('Connexion', { screen: 'ConnexionScreen' });
     }
   }
   return response;
@@ -48,3 +60,6 @@ export const fetchWithAuth = async (endpoint: string, options: any = {}) => {
         throw error;
     }
 };
+
+return fetchWithAuth;
+}

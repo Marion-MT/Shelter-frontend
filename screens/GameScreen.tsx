@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Image, ImageBackground, TouchableOpacity } from "react-native"
 import { NavigationProp, ParamListBase, useFocusEffect } from '@react-navigation/native';
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { fetchWithAuth } from '../components/fetchWithAuth';
+import { useFetchWithAuth } from '../components/fetchWithAuth';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -53,6 +53,8 @@ type GameResponse = {
 
 
 export default function GameScreen({ navigation }: GameScreenProps ) {
+
+    const fetchWithAuth = useFetchWithAuth();
 
     const dispatch = useDispatch();
 

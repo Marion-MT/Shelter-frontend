@@ -2,7 +2,7 @@ import 'react-native-reanimated';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { useFonts } from 'expo-font';
@@ -19,11 +19,12 @@ import IntroductionScreen from './screens/IntroductionScreen';
 import ParametreScreen from './screens/ParametreScreen';
 import SplashScreen from './screens/SplashScreen';
 import SuccesScreen from './screens/SuccesScreen';
-import RecapGameScreen from './screens/RecapGameScreen';
+import RecapGameScreen from './screens/RecapGameScreen';;
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+
 
   // Charge les sons et lance la musique de fond du menu
   useEffect(() => {

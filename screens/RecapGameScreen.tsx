@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, ScrollView, Image } from "react-native"
 import { NavigationProp, ParamListBase, useFocusEffect } from '@react-navigation/native';
 import { useSelector, useDispatch } from "react-redux";
-import { fetchWithAuth } from "../components/fetchWithAuth";
+import { useFetchWithAuth } from "../components/fetchWithAuth";
 import { setGameState, updateBestScore } from "../reducers/user";
 import { useCallback, useState } from "react";
 import Achievement from '../components/Achievement'
@@ -24,6 +24,7 @@ type RecapGameRouteParams = {
 
 
 export default function RecapGameScreen({ navigation, route }: RecapGameScreenProps & { route: { params: RecapGameRouteParams } }) {
+    const fetchWithAuth = useFetchWithAuth();
     const user = useSelector((state: string) => state.user.value);
     const dispatch = useDispatch();
     const [previousBestScore, setPreviousBestScore] = useState<number>(user.bestScore || 0);

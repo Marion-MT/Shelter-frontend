@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ImageBackground, Image, Pressable, TouchableOpa
 import { NavigationProp, ParamListBase } from '@react-navigation/native';
 import { Slider, Switch } from '@rneui/themed';
 import { useState, useEffect } from "react";
-import { fetchWithAuth } from "../components/fetchWithAuth";
+import { useFetchWithAuth } from "../components/fetchWithAuth";
 import { useSelector, useDispatch } from "react-redux";
 import { updateBestScore } from "../reducers/user";
 import { FontAwesome } from "@expo/vector-icons";
@@ -16,6 +16,7 @@ type ParametreScreenProps = {
 
 
 export default function ParametreScreen({ navigation }: ParametreScreenProps ) {
+    const fetchWithAuth = useFetchWithAuth();
     const user = useSelector((state: string) => state.user.value);
 
     const [volume, setVolume] = useState(user.volume);

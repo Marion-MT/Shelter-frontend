@@ -7,7 +7,7 @@ import { FontAwesome } from "@expo/vector-icons";
 
 import AudioManager from '../modules/audioManager';
 
-import { fetchWithAuth } from '../components/fetchWithAuth';
+import { useFetchWithAuth } from '../components/fetchWithAuth';
 
 type HomeScreenProps = {
     navigation: NavigationProp<ParamListBase>;
@@ -15,6 +15,7 @@ type HomeScreenProps = {
 
 
 export default function HomeScreen({ navigation }: HomeScreenProps ) {
+    const fetchWithAuth = useFetchWithAuth();
     const [currentGame, setCurrentGame] = useState(false);
     
     const user = useSelector((state: string) => state.user.value);
