@@ -62,7 +62,7 @@ export default function RecapGameScreen({ navigation, route }: RecapGameScreenPr
                         <Image source={require('../assets/icon-new.png')} style={styles.newLogo} />
                         </View>
                         <View style={styles.bestScore}>
-                            <Image source={require('../assets/icon-star.png')} style={styles.logo} />
+                            <Image source={require('../assets/icon-star-2.png')} style={styles.star} />
                             <Text style={styles.bestScoreText}>Last Record : {previousBestScore} jour{previousBestScore > 1 ? 's' : ''}</Text>
                         </View>
                         {succes.length === 0 ? (
@@ -87,7 +87,7 @@ export default function RecapGameScreen({ navigation, route }: RecapGameScreenPr
                     </View>
                     <Text style={styles.daysText}>Jours</Text>
                     <View style={styles.bestScore}>
-                        <Image source={require('../assets/icon-star.png')} style={styles.logo} />
+                        <Image source={require('../assets/icon-star-2.png')} style={styles.star} />
                         <Text style={styles.bestScoreText}>Record : {user.bestScore} jour{user.bestScore > 1 ? 's' : ''}</Text>
                     </View>
                     {succes.length === 0 ? (
@@ -214,6 +214,7 @@ const styles = StyleSheet.create({
     },
     bestScore: {
         marginTop: 20,
+        paddingRight: 15,
         width: '100%',
         height: 60,
         flexDirection: 'row',
@@ -226,10 +227,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#EFDAB7',
     },
-    logo: {
+    star: {
         marginRight: 15,
-        width: 25,
-        height: 25,
+        width: 35,
+        height: 35,
     },
     btnContainer: {
         flex: 1,

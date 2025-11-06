@@ -83,34 +83,6 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
             (ach) => ach.name === data.name)
 
             return <Achievement key={i} name={data.name} description={data.description} image={data.image} isUnlocked={isUnlocked}/>
-       /* return (
-            <View
-      key={i}
-      style={isUnlocked ? styles.unlockedAchievement : styles.lockedAchievement}
-    >
-      {false && <FontAwesome
-        style={styles.icone}
-        name={isUnlocked ? 'check-square-o' : 'square-o'}
-        size={20}
-        color={'#352c2bb0'}
-      />}
-        <View style={styles.imageContainer}>
-            {isUnlocked ? <Image style={styles.image} source={getImage(data.image)}/> : 
-            <FontAwesome
-            style={styles.unlockIcon}
-            name='lock'
-            size={50}
-            color={'#352c2bb0'}
-        />}
-        </View>
-        <View style={styles.textContainer}>
-        <Text style={styles.name}>{data.name}</Text>
-        <Text style={styles.description}>
-          {data.description.endsWith('.') ? data.description : `${data.description}.`}
-        </Text>
-      </View>
-    </View>
-  );*/
 });
 
   const medalsImages = [
@@ -132,7 +104,7 @@ export default function SuccesScreen({ navigation }: SuccesScreenProps ) {
           <Text style={styles.playerScore}>{player.bestScore} <Text style={styles.jours}>jours</Text></Text>
         </View>
       </View>
-      {player.username === user.username && <FontAwesome name='user' size={25} color='#554946'/>}
+      {player.username.trim() === user.username.trim() && <FontAwesome name='user' size={25} color='#554946'/>}
       
     </View>
   );
@@ -357,18 +329,7 @@ const styles = StyleSheet.create({
         gap: 12,
         
     },
-    rankBadge: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    rankNumber: {
-        color: 'white',
-        fontSize: 14,
-        fontFamily: 'ArialRounded',
-    },
+
     playerScore: {
         color: '#554946',
         fontSize: 24,
